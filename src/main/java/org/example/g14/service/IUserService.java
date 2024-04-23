@@ -1,5 +1,9 @@
 package org.example.g14.service;
 
-public interface IUserService {
+import org.example.g14.dto.UserFollowedDto;
 
+import java.util.List;
+
+public interface IUserService {
+    List<UserFollowedDto> listOfFollowersOfASellers(int userId);
 }
