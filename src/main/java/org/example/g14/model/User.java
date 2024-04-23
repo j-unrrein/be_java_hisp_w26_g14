@@ -12,6 +12,6 @@ import java.util.List;
 public class User {
     private int id;
     private String name;
-    private List<User> followers;
-    private List<User> follows;
+    private List<Integer> idFollowers;
+    private List<Integer> idFollows;
 }
