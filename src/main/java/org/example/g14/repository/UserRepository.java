@@ -29,19 +29,21 @@ public class UserRepository implements IUserRepository{
         listOfUsers = users;
     }
 
-
     @Override
     public List<User> getAll() {
-        return null;
+        return listOfUsers;
     }
 
     @Override
     public Optional<User> getById(int id) {
-        return Optional.empty();
+        return listOfUsers
+                .stream()
+                .filter(user -> user.getId() == id)
+                .findFirst();
     }
 
     @Override
     public void save(User user) {
-
+        listOfUsers.add(user);
     }
 }
