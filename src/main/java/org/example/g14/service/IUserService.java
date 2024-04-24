@@ -1,5 +1,6 @@
 package org.example.g14.service;
 
+import org.example.g14.dto.UserFollowDto;
 import org.example.g14.dto.UserFollowedDto;
 
 import org.example.g14.model.User;
@@ -9,7 +10,7 @@ import org.example.g14.dto.UserFollowersDto;
 
 public interface IUserService {
     UserFollowedDto getListOfFollowedSellers(int userId, String order);
-    User follow(int userId, int userIdToFollow);
+    UserFollowDto follow(int userId, int userIdToFollow);
     UserFollowersDto getAllFolowers(int id, String order);
     void unfollowSeller(int followerUserId, int sellerUserId);
     UserWithFollowersCountDto countFollowersBySeller(int id);
