@@ -1,21 +1,19 @@
 package org.example.g14.service;
 
-import org.example.g14.exception.ConflictException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.g14.dto.UserWithFollowersCountDto;
-import org.example.g14.exception.NotFoundException;
-import org.example.g14.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.dto.UserDto;
+import org.example.g14.dto.UserFollowedDto;
 import org.example.g14.dto.UserFollowersDto;
+import org.example.g14.dto.UserWithFollowersCountDto;
 import org.example.g14.exception.BadRequestException;
+import org.example.g14.exception.ConflictException;
+import org.example.g14.exception.NotFoundException;
+import org.example.g14.model.User;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -89,5 +87,25 @@ public class UserService implements IUserService{
 
         userRepository.save(user);
         return user;
+    }
+    @Override
+    public UserFollowedDto getListOfFollowedSellers(int userId) {
+        User user = getUserById(userId);
+        UserFollowedDto usersDto = new UserFollowedDto();
+
+        usersDto.setUser_id(user.getId());
+        usersDto.setUser_name(user.getName());
+
+        List<UserDto> listFollowed = new ArrayList<>();
+        for(int followed : user.getIdFollows()){
+            User foundUser = getUserById(followed);
+            UserDto followedUserDto = new UserDto();
+            followedUserDto.setUser_name(foundUser.getName());
+            followedUserDto.setUser_id(foundUser.getId());
+            listFollowed.add(followedUserDto);
+        }
+        usersDto.setFollowed(listFollowed);
+
+        return usersDto;
     }
 }
