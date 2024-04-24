@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "e67ffe1c-7795-42da-a608-311d353c82a4",
+		"_postman_id": "6edb6018-55dd-4b88-a7e6-9aca91318dbd",
 		"name": "SocialMeli",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "33873654"
+		"_exporter_id": "33853584"
 	},
 	"item": [
 		{
@@ -299,6 +299,135 @@
 				"method": "POST",
 				"header": [],
 				"url": "{{HOST}}/users/asdf/unfollow/20"
+			},
+			"response": []
+		},
+		{
+			"name": "0001 follow OK",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "localhost:8080/users/1/follow/20"
+			},
+			"response": []
+		},
+		{
+			"name": "0001 follow BAD_REQUEST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "localhost:8080/users/1/follow/34"
+			},
+			"response": []
+		},
+		{
+			"name": "0001 follow NOT_FOUND",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "localhost:8080/users/356/follow/34"
+			},
+			"response": []
+		},
+		{
+			"name": "0004 get followed OK",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/users/15/followed/list"
+			},
+			"response": []
+		},
+		{
+			"name": "0004 get followed NOT FOUND",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/users/332/followed/list"
+			},
+			"response": []
+		},
+		{
+			"name": "0008 getFollowersAsc OK",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/1/followers/list?order=name_asc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"followers",
+						"list"
+					],
+					"query": [
+						{
+							"key": "order",
+							"value": "name_asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "0008 getFollowersDesc OK",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/1/followers/list?order=name_desc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"followers",
+						"list"
+					],
+					"query": [
+						{
+							"key": "order",
+							"value": "name_desc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "0008 getFollowersDesc BAD REQUEST",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/1/followers/list?order=pedro",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"followers",
+						"list"
+					],
+					"query": [
+						{
+							"key": "order",
+							"value": "pedro"
+						}
+					]
+				}
 			},
 			"response": []
 		}
