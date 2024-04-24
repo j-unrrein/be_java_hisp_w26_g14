@@ -1,6 +1,7 @@
 package org.example.g14.service;
 
 import org.example.g14.exception.BadRequestException;
+import org.example.g14.exception.ConflictException;
 import org.example.g14.exception.NotFoundException;
 import org.example.g14.model.User;
 import org.example.g14.repository.IPostRepository;
@@ -32,7 +33,7 @@ public class UserService implements IUserService{
         User userToFollow = userToFollowOptional.get();
 
         if(user.getIdFollows().contains(userIdToFollow)){
-            throw new BadRequestException("El usuario con id " + userId + " ya sigue al usuario con id " + userIdToFollow);
+            throw new ConflictException("El usuario con id " + userId + " ya sigue al usuario con id " + userIdToFollow);
         }
 
 
