@@ -7,11 +7,29 @@
 	},
 	"item": [
 		{
-			"name": "obtener seguidores de un usuario",
+			"name": "0003 get followers OK",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": "http://localhost:8080/users/15/followers/list"
+			},
+			"response": []
+		},
+		{
+			"name": "0003 get followers BAD REQUEST",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/users/30/followers/list"
+			},
+			"response": []
+		},
+		{
+			"name": "0003 get followers NOT FOUND",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/users/332/followers/list"
 			},
 			"response": []
 		}

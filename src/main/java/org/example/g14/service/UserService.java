@@ -51,7 +51,6 @@ public class UserService implements IUserService{
         Optional<User> user = userRepository.getById(id);
         if(user.isEmpty())
             throw new NotFoundException("No se encontro el usuario");
-
         return user;
     }
 
