@@ -89,7 +89,7 @@ public class UserService implements IUserService{
         return user;
     }
     @Override
-    public UserFollowedDto listOfFollowedSellers(int userId) {
+    public UserFollowedDto getListOfFollowedSellers(int userId) {
         User user = getUserById(userId);
         UserFollowedDto usersDto = new UserFollowedDto();
 

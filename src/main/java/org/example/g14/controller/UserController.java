@@ -18,7 +18,7 @@ public class UserController {
 
     @GetMapping("/{userId}/followed/list")
     public ResponseEntity<?> getListOfFollowedSellers (@PathVariable int userId){
-        return new ResponseEntity<>(userService.listOfFollowedSellers(userId), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getListOfFollowedSellers(userId), HttpStatus.OK);
     }
 
     @PostMapping("/{userId}/follow/{userIdToFollow}")

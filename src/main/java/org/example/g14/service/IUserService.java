@@ -8,8 +8,7 @@ import org.example.g14.dto.UserWithFollowersCountDto;
 import org.example.g14.dto.UserFollowersDto;
 
 public interface IUserService {
-    UserFollowedDto listOfFollowedSellers(int userId);
-
+    UserFollowedDto getListOfFollowedSellers(int userId);
     User follow(int userId, int userIdToFollow);
     public UserWithFollowersCountDto countFollowersBySeller(int id);
     UserFollowersDto getAllFolowers(int id);
