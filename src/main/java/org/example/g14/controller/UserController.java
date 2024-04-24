@@ -20,4 +20,9 @@ public class UserController {
     public ResponseEntity<?> countFollowersBySeller(@PathVariable int userId){
         return new ResponseEntity<>(iUserService.countFollowersBySeller(userId), HttpStatus.OK);
     }
+    @GetMapping("/{userId}/followers/list")
+    public ResponseEntity<?> getFollowersList (@PathVariable int userId){
+        return new ResponseEntity<>(iUserService.getAllFolowers(userId), HttpStatus.OK);
+    }
+
 }

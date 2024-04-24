@@ -32,7 +32,7 @@ public class UserRepository implements IUserRepository{
 
     @Override
     public List<User> getAll() {
-        return null;
+        return listOfUsers;
     }
 
     @Override
