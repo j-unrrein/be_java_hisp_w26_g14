@@ -1,5 +1,14 @@
 package org.example.g14.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.g14.dto.UserDto;
+import org.example.g14.dto.UserFollowedDto;
+import org.example.g14.dto.UserFollowersDto;
+import org.example.g14.dto.UserWithFollowersCountDto;
+import org.example.g14.exception.BadRequestException;
+import org.example.g14.exception.ConflictException;
+import org.example.g14.exception.NotFoundException;
+import org.example.g14.model.User;
 import org.example.g14.dto.PostDto;
 import org.example.g14.exception.NotFoundException;
 import org.example.g14.model.Post;
@@ -8,6 +17,10 @@ import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,37 +36,87 @@ public class UserService implements IUserService{
     @Autowired
     IPostRepository postRepository;
 
+    ObjectMapper mapper = new ObjectMapper();
+
     @Override
-    public List<PostDto> getPostsFromFollowed(int userId) {
-        // Obtener al usuario por ID
-        User user = userRepository.getById(userId).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+    public UserWithFollowersCountDto countFollowersBySeller(int id) {
+        User user = getUserById(id);
+        return new UserWithFollowersCountDto(
+                user.getId(),
+                user.getName(),
+                (int) user.getIdFollowers().stream().count());
+    }
+    @Override
+    public UserFollowersDto getAllFolowers(int id) {
+        User user = getUserById(id);
 
-        // Obtener la lista de vendedores a los que sigue
-        List<Integer> followedVendors = user.getIdFollows();
+        if(user.getIdFollowers().size() == 0)
+            throw new BadRequestException("No es un vendedor");
 
-        // Obtener las publicaciones de los vendedores seguidos
-        List<Post> allPosts = new ArrayList<>();
-        for (Integer vendorId : followedVendors) {
-            allPosts.addAll(postRepository.findAllByUser(vendorId));
+        UserFollowersDto userFollowersDto = new UserFollowersDto(user.getId(),
+                                                                    user.getName(),
+                                                                    new ArrayList<>());
+        List<UserDto> userDtos = new ArrayList<>();
+
+        for (Integer idUser : user.getIdFollowers()) {
+            UserDto userDto = transferToUserDto(getUserById(idUser));
+            userDtos.add(userDto);
         }
 
-        // Filtrar publicaciones de las últimas dos semanas
-        LocalDate twoWeeksAgo = LocalDate.now().minusWeeks(2);
-        List<Post> recentPosts = allPosts.stream()
-                .filter(post -> post.getDate().isAfter(twoWeeksAgo))
-                .sorted(Comparator.comparing(Post::getDate).reversed()) // Orden descendente
-                .toList();
+        userFollowersDto.setFollowers(userDtos);
 
-        // Convertir a DTO para la respuesta
-        return recentPosts.stream()
-                .map(post -> new PostDto(
-                        post.getIdUser(),
-                        post.getId(),
-                        post.getDate(),
-                        post.getProduct(),
-                        post.getCategory(),
-                        post.getPrice()
-                ))
-                .collect(Collectors.toList());
+        return userFollowersDto;
+    }
+    public UserDto transferToUserDto(User user){
+       return new UserDto(user.getId(), user.getName());
+    }
+    public User getUserById(int id){
+        Optional<User> user = userRepository.getById(id);
+        if(user.isEmpty())
+            throw new NotFoundException("No se encontro el usuario");
+        return user.get();
+    }
+    @Override
+    public User follow(int userId, int userIdToFollow) {
+        Optional<User> userOptional = userRepository.getById(userId);
+        Optional<User> userToFollowOptional = userRepository.getById(userIdToFollow);
+
+        if (userOptional.isEmpty() || userToFollowOptional.isEmpty()) {
+            throw new NotFoundException("No se encontró uno o ambos usuarios");
+        }
+
+        User user = userOptional.get();
+        User userToFollow = userToFollowOptional.get();
+
+        if(user.getIdFollows().contains(userIdToFollow)){
+            throw new ConflictException("El usuario con id " + userId + " ya sigue al usuario con id " + userIdToFollow);
+        }
+
+
+        user.getIdFollows().add(userToFollow.getId());
+
+        userRepository.save(user);
+        return user;
+    }
+
+    @Override
+    public UserFollowedDto getListOfFollowedSellers(int userId) {
+        User user = getUserById(userId);
+        UserFollowedDto usersDto = new UserFollowedDto();
+
+        usersDto.setUser_id(user.getId());
+        usersDto.setUser_name(user.getName());
+
+        List<UserDto> listFollowed = new ArrayList<>();
+        for(int followed : user.getIdFollows()){
+            User foundUser = getUserById(followed);
+            UserDto followedUserDto = new UserDto();
+            followedUserDto.setUser_name(foundUser.getName());
+            followedUserDto.setUser_id(foundUser.getId());
+            listFollowed.add(followedUserDto);
+        }
+        usersDto.setFollowed(listFollowed);
+
+        return usersDto;
     }
 }
