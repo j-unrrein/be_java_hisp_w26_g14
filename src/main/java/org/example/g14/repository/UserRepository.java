@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +36,10 @@ public class UserRepository implements IUserRepository{
 
     @Override
     public Optional<User> getById(int id) {
-        return Optional.empty();
+        return listOfUsers
+                .stream()
+                .filter(user -> user.getId() == id)
+                .findFirst();
     }
 
     @Override
