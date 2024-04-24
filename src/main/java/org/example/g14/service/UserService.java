@@ -90,23 +90,18 @@ public class UserService implements IUserService{
     }
     @Override
     public UserFollowedDto listOfFollowedSellers(int userId) {
-        Optional<User> user = userRepository.getById(userId);
-        if (user.isEmpty()) throw new NotFoundException("No existe usuario con ese id");
-
+        User user = getUserById(userId);
         UserFollowedDto usersDto = new UserFollowedDto();
 
-        usersDto.setUser_id(user.get().getId());
-        usersDto.setUser_name(user.get().getName());
+        usersDto.setUser_id(user.getId());
+        usersDto.setUser_name(user.getName());
 
         List<UserDto> listFollowed = new ArrayList<>();
-        for(int followed : user.get().getIdFollows()){
-            Optional<User> findedUser = userRepository.getById(followed);
-
-            if(findedUser.isEmpty()) continue;
-
+        for(int followed : user.getIdFollows()){
+            User foundUser = getUserById(followed);
             UserDto followedUserDto = new UserDto();
-            followedUserDto.setUser_name(findedUser.get().getName());
-            followedUserDto.setUser_id(findedUser.get().getId());
+            followedUserDto.setUser_name(foundUser.getName());
+            followedUserDto.setUser_id(foundUser.getId());
             listFollowed.add(followedUserDto);
         }
         usersDto.setFollowed(listFollowed);
