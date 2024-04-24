@@ -143,25 +143,13 @@ public class UserService implements IUserService{
         return userFollowersDto;
     }
 
-    public UserDto transferToUserDto(User user){
-        return new UserDto(user.getId(), user.getName());
-    }
-
-    public User getUserById(int id){
-        Optional<User> user = userRepository.getById(id);
-        if(user.isEmpty())
-            throw new NotFoundException("No se encontro el usuario");
-        return user.get();
-    }
-
     @Override
     public void unfollowSeller(int followerUserId, int sellerUserId) {
 
-        User followerUser = userRepository.getById(followerUserId)
-            .orElseThrow(() -> new NotFoundException("No se encontró un Usuario con id=" + followerUserId));
+        User followerUser = getUserById(followerUserId);
 
-        if (userRepository.getById(sellerUserId).isEmpty())
-            throw new NotFoundException("No se encontró un Usuario con id=" + sellerUserId);
+        // Check if Seller User exists
+        getUserById(sellerUserId);
 
         // 'Integer.valueof' is needed because List.remove has an overload por a plain int parameter
         // that treats that parameter as an index in the List, not as the Object we are trying to remove.
@@ -173,5 +161,16 @@ public class UserService implements IUserService{
             );
 
         userRepository.save(followerUser);
+    }
+
+    private UserDto transferToUserDto(User user){
+        return new UserDto(user.getId(), user.getName());
+    }
+
+    private User getUserById(int id){
+        Optional<User> user = userRepository.getById(id);
+        if(user.isEmpty())
+            throw new NotFoundException("No se encontro el usuario");
+        return user.get();
     }
 }
