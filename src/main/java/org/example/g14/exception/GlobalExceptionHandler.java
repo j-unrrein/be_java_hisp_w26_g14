@@ -23,4 +23,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadRequestDeserializeException(){
         return new ResponseEntity<>(new ErrorDto("Campos inválidos y/o faltantes."), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<?> handleConflictException(Exception e){
+        return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.CONFLICT);
+    }
+
 }
