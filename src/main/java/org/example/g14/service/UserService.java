@@ -9,6 +9,10 @@ import org.example.g14.exception.BadRequestException;
 import org.example.g14.exception.ConflictException;
 import org.example.g14.exception.NotFoundException;
 import org.example.g14.model.User;
+import org.example.g14.dto.PostDto;
+import org.example.g14.exception.NotFoundException;
+import org.example.g14.model.Post;
+import org.example.g14.model.User;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService{
@@ -88,6 +98,7 @@ public class UserService implements IUserService{
         userRepository.save(user);
         return user;
     }
+
     @Override
     public UserFollowedDto getListOfFollowedSellers(int userId) {
         User user = getUserById(userId);

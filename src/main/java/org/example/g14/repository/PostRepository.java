@@ -10,6 +10,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class PostRepository implements IPostRepository{
@@ -33,7 +34,9 @@ public class PostRepository implements IPostRepository{
 
     @Override
     public List<Post> findAllByUser(int idUser) {
-        return null;
+        return listOfPosts.stream()
+                .filter(post -> post.getIdUser() == idUser)
+                .collect(Collectors.toList());
     }
 
     @Override
