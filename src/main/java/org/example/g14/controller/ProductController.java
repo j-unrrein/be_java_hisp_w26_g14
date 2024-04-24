@@ -5,12 +5,7 @@ import org.example.g14.service.IPostService;
 import org.example.g14.dto.PostDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,8 +24,9 @@ public class ProductController {
     }
 
     @GetMapping("/followed/{user_id}/list")
-    public ResponseEntity<List<PostDto>> getPostsFromFollowed(@PathVariable("user_id") int userId){
-        List<PostDto> posts = postService.getPostsFromFollowed(userId);
+    public ResponseEntity<List<PostDto>> getPostsFromFollowed(@PathVariable("user_id") int userId,
+                                                              @RequestParam(required = false) String order){
+        List<PostDto> posts = postService.getPostsFromFollowed(userId, order);
         return ResponseEntity.ok(posts);
     }
 }
