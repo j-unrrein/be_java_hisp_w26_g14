@@ -1,11 +1,29 @@
 {
 	"info": {
-		"_postman_id": "9fc15f39-975a-4737-89fe-86139c624c5b",
+		"_postman_id": "68dcddf5-e053-4b99-a9dc-a97bafca9d0b",
 		"name": "SocialMeli",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "33853584"
+		"_exporter_id": "34048972"
 	},
 	"item": [
+		{
+			"name": "0002 countFollowersBySeller OK",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/users/1/followers/count"
+			},
+			"response": []
+		},
+		{
+			"name": "0002 countFollowersBySeller NOT FOUND",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8080/users/37/followers/count"
+			},
+			"response": []
+		},
 		{
 			"name": "0003 get followers OK",
 			"request": {

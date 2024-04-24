@@ -1,6 +1,10 @@
 package org.example.g14.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.g14.dto.UserWithFollowersCountDto;
+import org.example.g14.exception.NotFoundException;
+import org.example.g14.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.dto.UserDto;
 import org.example.g14.dto.UserFollowersDto;
 import org.example.g14.exception.BadRequestException;
@@ -10,6 +14,8 @@ import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,20 +29,30 @@ public class UserService implements IUserService{
     @Autowired
     IPostRepository postRepository;
 
+    ObjectMapper mapper = new ObjectMapper();
+
+    @Override
+    public UserWithFollowersCountDto countFollowersBySeller(int id) {
+        User user = getUserById(id);
+        return new UserWithFollowersCountDto(
+                user.getId(),
+                user.getName(),
+                (int) user.getIdFollowers().stream().count());
+    }
     @Override
     public UserFollowersDto getAllFolowers(int id) {
-        Optional<User> user = getUserById(id);
+        User user = getUserById(id);
 
-        if(user.get().getIdFollowers().size() == 0)
+        if(user.getIdFollowers().size() == 0)
             throw new BadRequestException("No es un vendedor");
 
-        UserFollowersDto userFollowersDto = new UserFollowersDto(user.get().getId(),
-                                                                    user.get().getName(),
+        UserFollowersDto userFollowersDto = new UserFollowersDto(user.getId(),
+                                                                    user.getName(),
                                                                     new ArrayList<>());
         List<UserDto> userDtos = new ArrayList<>();
 
-        for (Integer idUser : user.get().getIdFollowers()) {
-            UserDto userDto = transferToUserDto(getUserById(idUser).get());
+        for (Integer idUser : user.getIdFollowers()) {
+            UserDto userDto = transferToUserDto(getUserById(idUser));
             userDtos.add(userDto);
         }
 
@@ -47,11 +63,11 @@ public class UserService implements IUserService{
     public UserDto transferToUserDto(User user){
        return new UserDto(user.getId(), user.getName());
     }
-    public Optional<User> getUserById(int id){
+    public User getUserById(int id){
         Optional<User> user = userRepository.getById(id);
         if(user.isEmpty())
             throw new NotFoundException("No se encontro el usuario");
-        return user;
+        return user.get();
     }
 
 }
