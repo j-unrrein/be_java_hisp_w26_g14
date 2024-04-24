@@ -15,13 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public class UserService implements IUserService{
-
     @Autowired
     IUserRepository userRepository;
 
@@ -38,36 +37,7 @@ public class UserService implements IUserService{
                 user.getName(),
                 (int) user.getIdFollowers().stream().count());
     }
-    @Override
-    public UserFollowersDto getAllFolowers(int id) {
-        User user = getUserById(id);
 
-        if(user.getIdFollowers().size() == 0)
-            throw new BadRequestException("No es un vendedor");
-
-        UserFollowersDto userFollowersDto = new UserFollowersDto(user.getId(),
-                                                                    user.getName(),
-                                                                    new ArrayList<>());
-        List<UserDto> userDtos = new ArrayList<>();
-
-        for (Integer idUser : user.getIdFollowers()) {
-            UserDto userDto = transferToUserDto(getUserById(idUser));
-            userDtos.add(userDto);
-        }
-
-        userFollowersDto.setFollowers(userDtos);
-
-        return userFollowersDto;
-    }
-    public UserDto transferToUserDto(User user){
-       return new UserDto(user.getId(), user.getName());
-    }
-    public User getUserById(int id){
-        Optional<User> user = userRepository.getById(id);
-        if(user.isEmpty())
-            throw new NotFoundException("No se encontro el usuario");
-        return user.get();
-    }
     @Override
     public User follow(int userId, int userIdToFollow) {
         Optional<User> userOptional = userRepository.getById(userId);
@@ -91,8 +61,25 @@ public class UserService implements IUserService{
         return user;
     }
 
+    private enum NameOrder{
+        NAME_ASC,
+        NAME_DESC
+    }
+
     @Override
-    public UserFollowedDto getListOfFollowedSellers(int userId) {
+    public UserFollowedDto getListOfFollowedSellers(int userId, String order) {
+
+        NameOrder orderEnum = null;
+
+        if(order != null ){
+            try {
+                orderEnum = NameOrder.valueOf(order.toUpperCase());
+            }
+            catch (IllegalArgumentException e){
+                throw new BadRequestException("Parametro de ordenamiento invalido");
+            }
+        }
+
         User user = getUserById(userId);
         UserFollowedDto usersDto = new UserFollowedDto();
 
@@ -107,9 +94,64 @@ public class UserService implements IUserService{
             followedUserDto.setUser_id(foundUser.getId());
             listFollowed.add(followedUserDto);
         }
+
+        if(orderEnum == NameOrder.NAME_ASC)
+            listFollowed.sort(Comparator.comparing(UserDto::getUser_name));
+        else if (orderEnum == NameOrder.NAME_DESC)
+            listFollowed.sort(Comparator.comparing(UserDto::getUser_name).reversed());
+
         usersDto.setFollowed(listFollowed);
 
         return usersDto;
+    }
+
+    @Override
+    public UserFollowersDto getAllFolowers(int id, String order) {
+        NameOrder orderEnum = null;
+
+        if(order != null ){
+            try {
+                orderEnum = NameOrder.valueOf(order.toUpperCase());
+            }
+            catch (IllegalArgumentException e){
+                throw new BadRequestException("Parametro de ordenamiento invalido");
+            }
+        }
+
+        User user = getUserById(id);
+
+        if(user.getIdFollowers().size() == 0)
+            throw new BadRequestException("No es un vendedor");
+
+        UserFollowersDto userFollowersDto = new UserFollowersDto(user.getId(),
+                user.getName(),
+                new ArrayList<>());
+        List<UserDto> userDtos = new ArrayList<>();
+
+        for (Integer idUser : user.getIdFollowers()) {
+            UserDto userDto = transferToUserDto(getUserById(idUser));
+            userDtos.add(userDto);
+        }
+
+        if(orderEnum == NameOrder.NAME_ASC)
+            userDtos.sort(Comparator.comparing(UserDto::getUser_name));
+        else if (orderEnum == NameOrder.NAME_DESC)
+            userDtos.sort(Comparator.comparing(UserDto::getUser_name).reversed());
+
+        userFollowersDto.setFollowers(userDtos);
+
+        return userFollowersDto;
+    }
+
+    public UserDto transferToUserDto(User user){
+        return new UserDto(user.getId(), user.getName());
+    }
+
+    public User getUserById(int id){
+        Optional<User> user = userRepository.getById(id);
+        if(user.isEmpty())
+            throw new NotFoundException("No se encontro el usuario");
+        return user.get();
     }
 
     @Override
