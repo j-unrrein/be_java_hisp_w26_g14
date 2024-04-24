@@ -1,5 +1,7 @@
 package org.example.g14.service;
 
-public interface IUserService {
+import org.example.g14.model.User;
 
+public interface IUserService {
+    User follow(int userId, int userIdToFollow);
 }
