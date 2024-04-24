@@ -14,6 +14,8 @@ import java.util.List;
 @Repository
 public class PostRepository implements IPostRepository{
     private List<Post> listOfPosts;
+    private static int postId;
+
     public PostRepository() throws IOException {
         //load list
         File file;
@@ -26,6 +28,7 @@ public class PostRepository implements IPostRepository{
         });
 
         listOfPosts = posts;
+        postId = posts.size();
     }
 
     @Override
@@ -35,6 +38,8 @@ public class PostRepository implements IPostRepository{
 
     @Override
     public void save(Post post) {
-
+        post.setId(postId);
+        listOfPosts.add(post);
+        postId++;
     }
 }
