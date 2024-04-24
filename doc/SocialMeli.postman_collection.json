@@ -1,11 +1,39 @@
 {
 	"info": {
-		"_postman_id": "04fed478-6f0c-4628-a613-b1dc2eaf1c6a",
+		"_postman_id": "9fc15f39-975a-4737-89fe-86139c624c5b",
 		"name": "SocialMeli",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "33873654"
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "33853584"
 	},
-	"item": [],
+	"item": [
+		{
+			"name": "0003 get followers OK",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/users/15/followers/list"
+			},
+			"response": []
+		},
+		{
+			"name": "0003 get followers BAD REQUEST",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/users/30/followers/list"
+			},
+			"response": []
+		},
+		{
+			"name": "0003 get followers NOT FOUND",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/users/332/followers/list"
+			},
+			"response": []
+		}
+	],
 	"event": [
 		{
 			"listen": "prerequest",
