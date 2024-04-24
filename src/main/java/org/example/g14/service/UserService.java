@@ -21,7 +21,6 @@ import java.util.Optional;
 
 @Service
 public class UserService implements IUserService{
-
     @Autowired
     IUserRepository userRepository;
 
@@ -62,11 +61,11 @@ public class UserService implements IUserService{
         return user;
     }
 
-
     private enum NameOrder{
         NAME_ASC,
         NAME_DESC
     }
+
     @Override
     public UserFollowedDto getListOfFollowedSellers(int userId, String order) {
 
@@ -105,6 +104,7 @@ public class UserService implements IUserService{
 
         return usersDto;
     }
+
     @Override
     public UserFollowersDto getAllFolowers(int id, String order) {
         NameOrder orderEnum = null;
@@ -142,9 +142,11 @@ public class UserService implements IUserService{
 
         return userFollowersDto;
     }
+
     public UserDto transferToUserDto(User user){
         return new UserDto(user.getId(), user.getName());
     }
+
     public User getUserById(int id){
         Optional<User> user = userRepository.getById(id);
         if(user.isEmpty())
