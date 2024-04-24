@@ -31,7 +31,7 @@ public class UserRepository implements IUserRepository{
 
     @Override
     public List<User> getAll() {
-        return null;
+        return listOfUsers;
     }
 
     @Override
@@ -45,5 +45,19 @@ public class UserRepository implements IUserRepository{
     @Override
     public void save(User user) {
 
+        boolean isUpdate = false;
+
+        for (int i = 0; i < listOfUsers.size(); ++i) {
+
+            if (listOfUsers.get(i).getId() == user.getId()) {
+
+                listOfUsers.set(i, user);
+                isUpdate = true;
+                break;
+            }
+        }
+
+        if (!isUpdate)
+            listOfUsers.add(user);
     }
 }
