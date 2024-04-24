@@ -7,14 +7,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class UserRepository implements IUserRepository{
-    private List<User> listOfUsers;
+
+    private final List<User> listOfUsers;
 
     public UserRepository() throws IOException {
         //load list
@@ -23,8 +23,7 @@ public class UserRepository implements IUserRepository{
         List<User> users;
 
         file = ResourceUtils.getFile("classpath:UsersDB.json");
-        users = objectMapper.readValue(file, new TypeReference<List<User>>() {
-        });
+        users = objectMapper.readValue(file, new TypeReference<>() {});
 
         listOfUsers = users;
     }
@@ -37,11 +36,27 @@ public class UserRepository implements IUserRepository{
 
     @Override
     public Optional<User> getById(int id) {
-        return Optional.empty();
+        return listOfUsers.stream()
+            .filter(user -> user.getId() == id)
+            .findFirst();
     }
 
     @Override
     public void save(User user) {
 
+        boolean isUpdate = false;
+
+        for (int i = 0; i < listOfUsers.size(); ++i) {
+
+            if (listOfUsers.get(i).getId() == user.getId()) {
+
+                listOfUsers.set(i, user);
+                isUpdate = true;
+                break;
+            }
+        }
+
+        if (!isUpdate)
+            listOfUsers.add(user);
     }
 }
