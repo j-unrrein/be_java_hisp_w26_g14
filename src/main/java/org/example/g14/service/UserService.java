@@ -1,18 +1,14 @@
 package org.example.g14.service;
 
+import org.example.g14.exception.BadRequestException;
+import org.example.g14.exception.NotFoundException;
+import org.example.g14.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.dto.UserDto;
 import org.example.g14.dto.UserFollowedDto;
 import org.example.g14.dto.UserFollowersDto;
 import org.example.g14.dto.UserWithFollowersCountDto;
-import org.example.g14.exception.BadRequestException;
 import org.example.g14.exception.ConflictException;
-import org.example.g14.exception.NotFoundException;
-import org.example.g14.model.User;
-import org.example.g14.dto.PostDto;
-import org.example.g14.exception.NotFoundException;
-import org.example.g14.model.Post;
-import org.example.g14.model.User;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService{
+
     @Autowired
     IUserRepository userRepository;
 
@@ -118,5 +110,26 @@ public class UserService implements IUserService{
         usersDto.setFollowed(listFollowed);
 
         return usersDto;
+    }
+
+    @Override
+    public void unfollowSeller(int followerUserId, int sellerUserId) {
+
+        User followerUser = userRepository.getById(followerUserId)
+            .orElseThrow(() -> new NotFoundException("No se encontró un Usuario con id=" + followerUserId));
+
+        if (userRepository.getById(sellerUserId).isEmpty())
+            throw new NotFoundException("No se encontró un Usuario con id=" + sellerUserId);
+
+        // 'Integer.valueof' is needed because List.remove has an overload por a plain int parameter
+        // that treats that parameter as an index in the List, not as the Object we are trying to remove.
+        boolean wasFollowing = followerUser.getIdFollows().remove(Integer.valueOf(sellerUserId));
+
+        if (!wasFollowing)
+            throw new ConflictException(
+                "El Usuario con id=%d no sigue al Usuario con id=%d".formatted(followerUserId, sellerUserId)
+            );
+
+        userRepository.save(followerUser);
     }
 }

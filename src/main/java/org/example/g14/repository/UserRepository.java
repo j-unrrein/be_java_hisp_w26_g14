@@ -13,7 +13,8 @@ import java.util.Optional;
 
 @Repository
 public class UserRepository implements IUserRepository{
-    private List<User> listOfUsers;
+
+    private final List<User> listOfUsers;
 
     public UserRepository() throws IOException {
         //load list
@@ -22,8 +23,7 @@ public class UserRepository implements IUserRepository{
         List<User> users;
 
         file = ResourceUtils.getFile("classpath:UsersDB.json");
-        users = objectMapper.readValue(file, new TypeReference<List<User>>() {
-        });
+        users = objectMapper.readValue(file, new TypeReference<>() {});
 
         listOfUsers = users;
     }
