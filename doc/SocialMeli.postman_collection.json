@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "80619c79-630e-4295-ba1d-97852be06075",
+		"_postman_id": "e67ffe1c-7795-42da-a608-311d353c82a4",
 		"name": "SocialMeli",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "34317590"
+		"_exporter_id": "33873654"
 	},
 	"item": [
 		{
@@ -266,42 +266,42 @@
 			},
 			"response": []
 		},
-      {
-        "name": "0007 - Unfollow User - OK",
-        "request": {
-          "method": "POST",
-          "header": [],
-          "url": "{{HOST}}/users/1/unfollow/6"
-        },
-        "response": []
-      },
-      {
-        "name": "0007 - Unfollow User - Not Found",
-        "request": {
-          "method": "POST",
-          "header": [],
-          "url": "{{HOST}}/users/40/unfollow/20"
-        },
-        "response": []
-      },
-      {
-        "name": "0007 - Unfollow User - Bad Request (Not a follower)",
-        "request": {
-          "method": "POST",
-          "header": [],
-          "url": "{{HOST}}/users/1/unfollow/20"
-        },
-        "response": []
-      },
-      {
-        "name": "0007 - Unfollow User - Bad Request (User ID is not an int)",
-        "request": {
-          "method": "POST",
-          "header": [],
-          "url": "{{HOST}}/users/asdf/unfollow/20"
-        },
-        "response": []
-      }
+		{
+			"name": "0007 - Unfollow User - OK",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{HOST}}/users/1/unfollow/6"
+			},
+			"response": []
+		},
+		{
+			"name": "0007 - Unfollow User - Not Found",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{HOST}}/users/40/unfollow/20"
+			},
+			"response": []
+		},
+		{
+			"name": "0007 - Unfollow User - Conflict (Not a follower)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{HOST}}/users/1/unfollow/20"
+			},
+			"response": []
+		},
+		{
+			"name": "0007 - Unfollow User - Bad Request (User ID is not an int)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{HOST}}/users/asdf/unfollow/20"
+			},
+			"response": []
+		}
 	],
 	"event": [
 		{
