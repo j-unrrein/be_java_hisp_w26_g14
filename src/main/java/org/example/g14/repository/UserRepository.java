@@ -32,18 +32,33 @@ public class UserRepository implements IUserRepository{
 
     @Override
     public List<User> getAll() {
-        return null;
+        return listOfUsers;
     }
 
     @Override
     public Optional<User> getById(int id) {
-        return listOfUsers.stream()
-                .filter(u -> u.getId() == id)
+        return listOfUsers
+                .stream()
+                .filter(user -> user.getId() == id)
                 .findFirst();
     }
 
     @Override
     public void save(User user) {
 
+        boolean isUpdate = false;
+
+        for (int i = 0; i < listOfUsers.size(); ++i) {
+
+            if (listOfUsers.get(i).getId() == user.getId()) {
+
+                listOfUsers.set(i, user);
+                isUpdate = true;
+                break;
+            }
+        }
+
+        if (!isUpdate)
+            listOfUsers.add(user);
     }
 }
