@@ -32,6 +32,15 @@
 				"url": "{{HOST}}/users/1/unfollow/20"
 			},
 			"response": []
+		},
+		{
+			"name": "0007 - Unfollow User - Bad Request (User ID is not an int)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{HOST}}/users/asdf/unfollow/20"
+			},
+			"response": []
 		}
 	],
 	"event": [
