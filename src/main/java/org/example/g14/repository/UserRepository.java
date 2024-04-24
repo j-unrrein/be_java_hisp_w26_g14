@@ -31,14 +31,15 @@ public class UserRepository implements IUserRepository{
 
     @Override
     public List<User> getAll() {
-        return null;
+        return listOfUsers;
     }
 
     @Override
     public Optional<User> getById(int id) {
-        return listOfUsers.stream()
-            .filter(user -> user.getId() == id)
-            .findFirst();
+        return listOfUsers
+                .stream()
+                .filter(user -> user.getId() == id)
+                .findFirst();
     }
 
     @Override
