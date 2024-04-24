@@ -32,6 +32,10 @@ public class UserService implements IUserService{
     @Override
     public UserWithFollowersCountDto countFollowersBySeller(int id) {
         User user = getUserById(id);
+        if(postRepository.findAllByUser(user.getId()).isEmpty()){
+            throw new BadRequestException("El usuario con el ID:" + id + " no es un vendedor");
+        }
+
         return new UserWithFollowersCountDto(
                 user.getId(),
                 user.getName(),
