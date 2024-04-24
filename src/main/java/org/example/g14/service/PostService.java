@@ -1,9 +1,12 @@
 package org.example.g14.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.dto.CreatePostDto;
 import org.example.g14.dto.PostDto;
+import org.example.g14.dto.ProductDto;
 import org.example.g14.exception.NotFoundException;
 import org.example.g14.model.Post;
+import org.example.g14.model.Product;
 import org.example.g14.model.User;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
@@ -25,6 +28,8 @@ public class PostService implements IPostService {
 
     @Autowired
     IUserRepository userRepository;
+
+    ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void add(CreatePostDto createPostDto) {
@@ -57,14 +62,25 @@ public class PostService implements IPostService {
                 .toList();
 
         return recentPosts.stream()
-                .map(post -> new PostDto(
-                        post.getIdUser(),
-                        post.getId(),
-                        post.getDate(),
-                        post.getProduct(),
-                        post.getCategory(),
-                        post.getPrice()
-                ))
+                .map(post -> {
+
+                    ProductDto productDto = new ProductDto();
+                    productDto.setId(post.getProduct().getId());
+                    productDto.setName(post.getProduct().getName());
+                    productDto.setType(post.getProduct().getType());
+                    productDto.setBrand(post.getProduct().getBrand());
+                    productDto.setColor(post.getProduct().getColor());
+                    productDto.setNotes(post.getProduct().getNotes());
+
+                    return new PostDto(
+                            post.getIdUser(),
+                            post.getId(),
+                            post.getDate(),
+                            productDto,
+                            post.getCategory(),
+                            post.getPrice()
+                    );
+                })
                 .collect(Collectors.toList());
     }
 }
