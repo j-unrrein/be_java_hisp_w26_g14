@@ -1,12 +1,11 @@
 package org.example.g14.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.dto.CreatePostDto;
 import org.example.g14.dto.PostDto;
 import org.example.g14.dto.ProductDto;
+import org.example.g14.exception.BadRequestException;
 import org.example.g14.exception.NotFoundException;
 import org.example.g14.model.Post;
-import org.example.g14.model.Product;
 import org.example.g14.model.User;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
@@ -29,8 +28,6 @@ public class PostService implements IPostService {
     @Autowired
     IUserRepository userRepository;
 
-    ObjectMapper mapper = new ObjectMapper();
-
     @Override
     public void add(CreatePostDto createPostDto) {
         PostMapper postMapper = new PostMapper();
@@ -45,7 +42,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public List<PostDto> getPostsFromFollowed(int userId) {
+    public List<PostDto> getPostsFromFollowed(int userId, String order) {
         User user = userRepository.getById(userId).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         List<Integer> followedVendors = user.getIdFollows();
@@ -55,11 +52,20 @@ public class PostService implements IPostService {
             allPosts.addAll(postRepository.findAllByUser(vendorId));
         }
 
+        if (order != null && !order.isEmpty() && !order.equals("date_asc") && !order.equals("date_desc")) {
+            throw new BadRequestException("Tipo de orden inválido");
+        }
+
         LocalDate twoWeeksAgo = LocalDate.now().minusWeeks(2);
-        List<Post> recentPosts = allPosts.stream()
+        List<Post> recentPosts = new ArrayList<>(allPosts.stream()
                 .filter(post -> post.getDate().isAfter(twoWeeksAgo))
-                .sorted(Comparator.comparing(Post::getDate).reversed()) // Orden descendente
-                .toList();
+                .toList());
+
+        if (order != null && order.equals("date_asc")) {
+            recentPosts.sort(Comparator.comparing(Post::getDate));
+        } else if (order != null && order.equals("date_desc")) {
+            recentPosts.sort(Comparator.comparing(Post::getDate).reversed());
+        }
 
         return recentPosts.stream()
                 .map(post -> {
