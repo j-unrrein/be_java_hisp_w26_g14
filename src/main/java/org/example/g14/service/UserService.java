@@ -153,7 +153,7 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public void unfollowSeller(int followerUserId, int sellerUserId) {
+    public UserFollowDto unfollowSeller(int followerUserId, int sellerUserId) {
 
         User followerUser = getUserById(followerUserId);
 
@@ -170,6 +170,12 @@ public class UserService implements IUserService{
             );
 
         userRepository.save(followerUser);
+
+        return new UserFollowDto(
+            followerUser.getName(),
+            followerUser.getIdFollowers(),
+            followerUser.getIdFollows()
+        );
     }
 
     private UserDto transferToUserDto(User user){
