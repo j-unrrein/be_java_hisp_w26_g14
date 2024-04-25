@@ -44,8 +44,8 @@ public class UserController {
         @PathVariable("userId") int followerUserId,
         @PathVariable("userIdToUnfollow") int sellerUserId
     ) {
-        userService.unfollowSeller(followerUserId, sellerUserId);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(
+            userService.unfollowSeller(followerUserId, sellerUserId)
+        );
     }
 }
