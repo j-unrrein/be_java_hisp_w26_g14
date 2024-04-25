@@ -1,13 +1,10 @@
 package org.example.g14.service;
 
+import org.example.g14.dto.*;
 import org.example.g14.exception.BadRequestException;
 import org.example.g14.exception.NotFoundException;
 import org.example.g14.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.g14.dto.UserDto;
-import org.example.g14.dto.UserFollowedDto;
-import org.example.g14.dto.UserFollowersDto;
-import org.example.g14.dto.UserWithFollowersCountDto;
 import org.example.g14.exception.ConflictException;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
@@ -43,12 +40,20 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public User follow(int userId, int userIdToFollow) {
+    public UserFollowDto follow(int userId, int userIdToFollow) {
+        if(userId == userIdToFollow){
+            throw new BadRequestException("No te podes seguir a vos mismo maquina");
+        }
+
         Optional<User> userOptional = userRepository.getById(userId);
         Optional<User> userToFollowOptional = userRepository.getById(userIdToFollow);
 
         if (userOptional.isEmpty() || userToFollowOptional.isEmpty()) {
             throw new NotFoundException("No se encontró uno o ambos usuarios");
+        }
+
+        if(postRepository.findAllByUser(userIdToFollow).isEmpty()){
+            throw new BadRequestException("El usuario con el ID: " + userIdToFollow + " no es un vendedor");
         }
 
         User user = userOptional.get();
@@ -62,7 +67,7 @@ public class UserService implements IUserService{
         user.getIdFollows().add(userToFollow.getId());
 
         userRepository.save(user);
-        return user;
+        return new UserFollowDto(user.getName(),user.getIdFollows(),userToFollow.getIdFollowers());
     }
 
     private enum NameOrder{
