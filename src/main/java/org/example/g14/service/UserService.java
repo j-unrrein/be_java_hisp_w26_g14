@@ -41,32 +41,28 @@ public class UserService implements IUserService{
 
     @Override
     public UserFollowedDto follow(int userId, int userIdToFollow) {
+
         if(userId == userIdToFollow){
             throw new BadRequestException("No te podes seguir a vos mismo maquina");
         }
 
-        Optional<User> userOptional = userRepository.getById(userId);
-        Optional<User> userToFollowOptional = userRepository.getById(userIdToFollow);
-
-        if (userOptional.isEmpty() || userToFollowOptional.isEmpty()) {
-            throw new NotFoundException("No se encontró uno o ambos usuarios");
-        }
+        User user = getUserById(userId);
+        User userToFollow = getUserById(userIdToFollow);
 
         if(postRepository.findAllByUser(userIdToFollow).isEmpty()){
             throw new BadRequestException("El usuario con el ID: " + userIdToFollow + " no es un vendedor");
         }
 
-        User user = userOptional.get();
-        User userToFollow = userToFollowOptional.get();
-
         if(user.getIdFollows().contains(userIdToFollow)){
             throw new ConflictException("El usuario con id " + userId + " ya sigue al usuario con id " + userIdToFollow);
         }
 
-
         user.getIdFollows().add(userToFollow.getId());
+        userToFollow.getIdFollowers().add(user.getId());
 
         userRepository.save(user);
+        userRepository.save(userToFollow);
+
         return transferToUserFollowedDto(user);
     }
 
@@ -129,7 +125,7 @@ public class UserService implements IUserService{
 
         User user = getUserById(id);
 
-        if(user.getIdFollowers().size() == 0)
+        if (postRepository.findAllByUser(id).isEmpty())
             throw new BadRequestException("No es un vendedor");
 
         UserFollowersDto userFollowersDto = new UserFollowersDto(user.getId(),
@@ -158,11 +154,12 @@ public class UserService implements IUserService{
         User followerUser = getUserById(followerUserId);
 
         // Check if Seller User exists
-        getUserById(sellerUserId);
+        User sellerUser = getUserById(sellerUserId);
 
         // 'Integer.valueof' is needed because List.remove has an overload por a plain int parameter
         // that treats that parameter as an index in the List, not as the Object we are trying to remove.
         boolean wasFollowing = followerUser.getIdFollows().remove(Integer.valueOf(sellerUserId));
+        sellerUser.getIdFollowers().remove(Integer.valueOf(followerUserId));
 
         if (!wasFollowing)
             throw new ConflictException(
@@ -170,6 +167,7 @@ public class UserService implements IUserService{
             );
 
         userRepository.save(followerUser);
+        userRepository.save(sellerUser);
 
         return transferToUserFollowedDto(followerUser);
     }
