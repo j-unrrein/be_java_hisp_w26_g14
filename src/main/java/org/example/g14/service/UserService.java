@@ -158,11 +158,12 @@ public class UserService implements IUserService{
         User followerUser = getUserById(followerUserId);
 
         // Check if Seller User exists
-        getUserById(sellerUserId);
+        User sellerUser = getUserById(sellerUserId);
 
         // 'Integer.valueof' is needed because List.remove has an overload por a plain int parameter
         // that treats that parameter as an index in the List, not as the Object we are trying to remove.
         boolean wasFollowing = followerUser.getIdFollows().remove(Integer.valueOf(sellerUserId));
+        sellerUser.getIdFollowers().remove(Integer.valueOf(followerUserId));
 
         if (!wasFollowing)
             throw new ConflictException(
@@ -170,6 +171,7 @@ public class UserService implements IUserService{
             );
 
         userRepository.save(followerUser);
+        userRepository.save(sellerUser);
 
         return transferToUserFollowedDto(followerUser);
     }
