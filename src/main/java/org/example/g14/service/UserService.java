@@ -129,7 +129,7 @@ public class UserService implements IUserService{
 
         User user = getUserById(id);
 
-        if(user.getIdFollowers().size() == 0)
+        if (postRepository.findAllByUser(id).isEmpty())
             throw new BadRequestException("No es un vendedor");
 
         UserFollowersDto userFollowersDto = new UserFollowersDto(user.getId(),
