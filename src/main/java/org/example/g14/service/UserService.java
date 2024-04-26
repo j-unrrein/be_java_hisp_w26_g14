@@ -40,7 +40,7 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public UserFollowDto follow(int userId, int userIdToFollow) {
+    public UserFollowedDto follow(int userId, int userIdToFollow) {
         if(userId == userIdToFollow){
             throw new BadRequestException("No te podes seguir a vos mismo maquina");
         }
@@ -67,7 +67,7 @@ public class UserService implements IUserService{
         user.getIdFollows().add(userToFollow.getId());
 
         userRepository.save(user);
-        return new UserFollowDto(user.getName(),user.getIdFollows(),userToFollow.getIdFollowers());
+        return transferToUserFollowedDto(user);
     }
 
     private enum NameOrder{
@@ -153,7 +153,7 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public UserFollowDto unfollowSeller(int followerUserId, int sellerUserId) {
+    public UserFollowedDto unfollowSeller(int followerUserId, int sellerUserId) {
 
         User followerUser = getUserById(followerUserId);
 
@@ -171,15 +171,25 @@ public class UserService implements IUserService{
 
         userRepository.save(followerUser);
 
-        return new UserFollowDto(
-            followerUser.getName(),
-            followerUser.getIdFollowers(),
-            followerUser.getIdFollows()
-        );
+        return transferToUserFollowedDto(followerUser);
     }
 
     private UserDto transferToUserDto(User user){
         return new UserDto(user.getId(), user.getName());
+    }
+
+    private UserFollowedDto transferToUserFollowedDto(User user) {
+
+        List<UserDto> followedUsers = user.getIdFollows().stream()
+            .map(this::getUserById)
+            .map(this::transferToUserDto)
+            .toList();
+
+        return new UserFollowedDto(
+            user.getId(),
+            user.getName(),
+            followedUsers
+        );
     }
 
     private User getUserById(int id){
