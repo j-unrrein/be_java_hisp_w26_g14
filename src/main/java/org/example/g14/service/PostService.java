@@ -1,6 +1,7 @@
 package org.example.g14.service;
 
 import org.example.g14.dto.request.PostCreateRequestDto;
+import org.example.g14.dto.response.MessageResponseDto;
 import org.example.g14.dto.response.PostResponseDto;
 import org.example.g14.dto.ProductDto;
 import org.example.g14.exception.OrderInvalidException;
@@ -31,13 +32,14 @@ public class PostService implements IPostService {
     IUserRepository userRepository;
 
     @Override
-    public void add(PostCreateRequestDto postCreateRequestDto) {
+    public MessageResponseDto add(PostCreateRequestDto postCreateRequestDto) {
         PostMapper postMapper = new PostMapper();
         Post post = postMapper.createPostDtoToPost(postCreateRequestDto);
 
         userServiceInternal.searchUserIfExists(post.getIdUser());
 
         postRepository.save(post);
+        return new MessageResponseDto("Post creado exitosamente.");
     }
 
     @Override

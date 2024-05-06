@@ -1,9 +1,10 @@
 package org.example.g14.controller;
 
 import org.example.g14.dto.request.PostCreateRequestDto;
-import org.example.g14.service.IPostService;
 import org.example.g14.dto.response.PostResponseDto;
+import org.example.g14.service.IPostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +17,11 @@ public class ProductController {
     IPostService postService;
 
     @PostMapping("/post")
-    public ResponseEntity<Void> createPost(
+    public ResponseEntity<?> createPost(
         @RequestBody PostCreateRequestDto postCreateRequestDto
     ) {
-        postService.add(postCreateRequestDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(postService.
+                add(postCreateRequestDto), HttpStatus.OK);
     }
 
     @GetMapping("/followed/{user_id}/list")
