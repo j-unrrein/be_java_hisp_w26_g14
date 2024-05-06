@@ -1,8 +1,9 @@
-package org.example.g14.dto;
+package org.example.g14.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.g14.dto.ProductDto;
 
 import java.time.LocalDate;
 
