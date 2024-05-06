@@ -3,7 +3,7 @@ package org.example.g14.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.model.Post;
-import org.example.g14.model.User;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 
@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class PostRepository implements IPostRepository{
-    private List<Post> listOfPosts;
-    private static int postId;
+    private final List<Post> listOfPosts;
 
     public PostRepository() throws IOException {
         //load list
@@ -25,11 +24,10 @@ public class PostRepository implements IPostRepository{
         List<Post> posts;
 
         file = ResourceUtils.getFile("classpath:PostsDB.json");
-        posts = objectMapper.readValue(file, new TypeReference<List<Post>>() {
+        posts = objectMapper.readValue(file, new TypeReference<>() {
         });
 
         listOfPosts = posts;
-        postId = posts.size() + 1;
     }
 
     @Override
@@ -41,8 +39,11 @@ public class PostRepository implements IPostRepository{
 
     @Override
     public void save(Post post) {
-        post.setId(postId);
+        post.setId(getMaxId() + 1);
         listOfPosts.add(post);
-        postId++;
+    }
+
+    private int getMaxId(){
+        return listOfPosts.stream().mapToInt(Post::getId).max().orElse(0);
     }
 }
