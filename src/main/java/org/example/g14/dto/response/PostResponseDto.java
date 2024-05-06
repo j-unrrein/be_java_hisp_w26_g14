@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostDto {
+public class PostResponseDto {
     private int user_id;
     private int post_id;
     private LocalDate date;

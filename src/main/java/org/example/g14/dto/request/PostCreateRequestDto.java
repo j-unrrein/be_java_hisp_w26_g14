@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePostDto {
+public class PostCreateRequestDto {
     @JsonProperty("user_id")
     private int idUser;
     @JsonDeserialize(using = CustomLocalDateDeserializer.class)

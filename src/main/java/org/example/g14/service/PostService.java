@@ -1,10 +1,8 @@
 package org.example.g14.service;
 
-import org.example.g14.dto.CreatePostDto;
-import org.example.g14.dto.PostDto;
+import org.example.g14.dto.request.PostCreateRequestDto;
+import org.example.g14.dto.response.PostResponseDto;
 import org.example.g14.dto.ProductDto;
-import org.example.g14.exception.BadRequestException;
-import org.example.g14.exception.NotFoundException;
 import org.example.g14.exception.OrderInvalidException;
 import org.example.g14.model.Post;
 import org.example.g14.model.User;
@@ -12,14 +10,12 @@ import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.example.g14.utils.PostMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,9 +31,9 @@ public class PostService implements IPostService {
     IUserRepository userRepository;
 
     @Override
-    public void add(CreatePostDto createPostDto) {
+    public void add(PostCreateRequestDto postCreateRequestDto) {
         PostMapper postMapper = new PostMapper();
-        Post post = postMapper.createPostDtoToPost(createPostDto);
+        Post post = postMapper.createPostDtoToPost(postCreateRequestDto);
 
         userServiceInternal.searchUserIfExists(post.getIdUser());
 
@@ -45,7 +41,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public List<PostDto> getPostsFromFollowed(int userId, String order) {
+    public List<PostResponseDto> getPostsFromFollowed(int userId, String order) {
 
         User user = userServiceInternal.searchUserIfExists(userId);
 
@@ -82,7 +78,7 @@ public class PostService implements IPostService {
                     productDto.setColor(post.getProduct().getColor());
                     productDto.setNotes(post.getProduct().getNotes());
 
-                    return new PostDto(
+                    return new PostResponseDto(
                             post.getIdUser(),
                             post.getId(),
                             post.getDate(),

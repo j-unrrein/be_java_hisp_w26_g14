@@ -1,4 +1,4 @@
-package org.example.g14.dto;
+package org.example.g14.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserFollowedDto {
-    private int user_id;
-    private String user_name;
-    private List<UserDto> followed;
+public class UserFollowedResponseDto extends UserResponseDto {
+    private List<UserResponseDto> followed;
+
+    public UserFollowedResponseDto(int user_id, String user_name, List<UserResponseDto> followed) {
+        super(user_id, user_name);
+        this.followed = followed;
+    }
 }

@@ -1,6 +1,9 @@
 package org.example.g14.service;
 
-import org.example.g14.dto.*;
+import org.example.g14.dto.response.UserResponseDto;
+import org.example.g14.dto.response.UserFollowedResponseDto;
+import org.example.g14.dto.response.UserFollowersResponseDto;
+import org.example.g14.dto.response.UserFollowersCountResponseDto;
 import org.example.g14.exception.*;
 import org.example.g14.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,20 +29,20 @@ public class UserService implements IUserService, IUserServiceInternal {
     ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public UserWithFollowersCountDto countFollowersBySeller(int id) {
+    public UserFollowersCountResponseDto countFollowersBySeller(int id) {
         User user = searchUserIfExists(id);
         if(postRepository.findAllByUser(user.getId()).isEmpty()){
             throw new NotSellerException(id);
         }
 
-        return new UserWithFollowersCountDto(
+        return new UserFollowersCountResponseDto(
                 user.getId(),
                 user.getName(),
                 user.getIdFollowers().size());
     }
 
     @Override
-    public UserFollowedDto follow(int userId, int userIdToFollow) {
+    public UserFollowedResponseDto follow(int userId, int userIdToFollow) {
 
         if(userId == userIdToFollow){
             throw new BadRequestException("Un usuario no se puede seguir a si mismo.");
@@ -71,7 +74,7 @@ public class UserService implements IUserService, IUserServiceInternal {
     }
 
     @Override
-    public UserFollowedDto getListOfFollowedSellers(int userId, String order) {
+    public UserFollowedResponseDto getListOfFollowedSellers(int userId, String order) {
 
         NameOrder orderEnum = null;
 
@@ -85,24 +88,24 @@ public class UserService implements IUserService, IUserServiceInternal {
         }
 
         User user = searchUserIfExists(userId);
-        UserFollowedDto usersDto = new UserFollowedDto();
+        UserFollowedResponseDto usersDto = new UserFollowedResponseDto();
 
         usersDto.setUser_id(user.getId());
         usersDto.setUser_name(user.getName());
 
-        List<UserDto> listFollowed = new ArrayList<>();
+        List<UserResponseDto> listFollowed = new ArrayList<>();
         for(int followed : user.getIdFollows()){
             User foundUser = searchUserIfExists(followed);
-            UserDto followedUserDto = new UserDto();
-            followedUserDto.setUser_name(foundUser.getName());
-            followedUserDto.setUser_id(foundUser.getId());
-            listFollowed.add(followedUserDto);
+            UserResponseDto followedUserResponseDto = new UserResponseDto();
+            followedUserResponseDto.setUser_name(foundUser.getName());
+            followedUserResponseDto.setUser_id(foundUser.getId());
+            listFollowed.add(followedUserResponseDto);
         }
 
         if(orderEnum == NameOrder.NAME_ASC)
-            listFollowed.sort(Comparator.comparing(UserDto::getUser_name));
+            listFollowed.sort(Comparator.comparing(UserResponseDto::getUser_name));
         else if (orderEnum == NameOrder.NAME_DESC)
-            listFollowed.sort(Comparator.comparing(UserDto::getUser_name).reversed());
+            listFollowed.sort(Comparator.comparing(UserResponseDto::getUser_name).reversed());
 
         usersDto.setFollowed(listFollowed);
 
@@ -110,7 +113,7 @@ public class UserService implements IUserService, IUserServiceInternal {
     }
 
     @Override
-    public UserFollowersDto getAllFolowers(int id, String order) {
+    public UserFollowersResponseDto getAllFolowers(int id, String order) {
         NameOrder orderEnum = null;
 
         if(order != null ){
@@ -127,28 +130,28 @@ public class UserService implements IUserService, IUserServiceInternal {
         if (postRepository.findAllByUser(id).isEmpty())
             throw new NotSellerException(id);
 
-        UserFollowersDto userFollowersDto = new UserFollowersDto(user.getId(),
+        UserFollowersResponseDto userFollowersResponseDto = new UserFollowersResponseDto(user.getId(),
                 user.getName(),
                 new ArrayList<>());
-        List<UserDto> userDtos = new ArrayList<>();
+        List<UserResponseDto> userResponseDtos = new ArrayList<>();
 
         for (Integer idUser : user.getIdFollowers()) {
-            UserDto userDto = transferToUserDto(searchUserIfExists(idUser));
-            userDtos.add(userDto);
+            UserResponseDto userResponseDto = transferToUserDto(searchUserIfExists(idUser));
+            userResponseDtos.add(userResponseDto);
         }
 
         if(orderEnum == NameOrder.NAME_ASC)
-            userDtos.sort(Comparator.comparing(UserDto::getUser_name));
+            userResponseDtos.sort(Comparator.comparing(UserResponseDto::getUser_name));
         else if (orderEnum == NameOrder.NAME_DESC)
-            userDtos.sort(Comparator.comparing(UserDto::getUser_name).reversed());
+            userResponseDtos.sort(Comparator.comparing(UserResponseDto::getUser_name).reversed());
 
-        userFollowersDto.setFollowers(userDtos);
+        userFollowersResponseDto.setFollowers(userResponseDtos);
 
-        return userFollowersDto;
+        return userFollowersResponseDto;
     }
 
     @Override
-    public UserFollowedDto unfollowSeller(int followerUserId, int sellerUserId) {
+    public UserFollowedResponseDto unfollowSeller(int followerUserId, int sellerUserId) {
 
         User followerUser = searchUserIfExists(followerUserId);
 
@@ -171,18 +174,18 @@ public class UserService implements IUserService, IUserServiceInternal {
         return transferToUserFollowedDto(followerUser);
     }
 
-    private UserDto transferToUserDto(User user){
-        return new UserDto(user.getId(), user.getName());
+    private UserResponseDto transferToUserDto(User user){
+        return new UserResponseDto(user.getId(), user.getName());
     }
 
-    private UserFollowedDto transferToUserFollowedDto(User user) {
+    private UserFollowedResponseDto transferToUserFollowedDto(User user) {
 
-        List<UserDto> followedUsers = user.getIdFollows().stream()
+        List<UserResponseDto> followedUsers = user.getIdFollows().stream()
             .map(this::searchUserIfExists)
             .map(this::transferToUserDto)
             .toList();
 
-        return new UserFollowedDto(
+        return new UserFollowedResponseDto(
             user.getId(),
             user.getName(),
             followedUsers
