@@ -9,6 +9,7 @@ import org.example.g14.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
+import org.example.g14.utils.NameOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,11 +67,6 @@ public class UserService implements IUserService, IUserServiceInternal {
         userRepository.save(userToFollow);
 
         return transferToUserFollowedDto(user);
-    }
-
-    private enum NameOrder{
-        NAME_ASC,
-        NAME_DESC
     }
 
     @Override
