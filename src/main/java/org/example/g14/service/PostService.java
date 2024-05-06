@@ -5,12 +5,14 @@ import org.example.g14.dto.PostDto;
 import org.example.g14.dto.ProductDto;
 import org.example.g14.exception.BadRequestException;
 import org.example.g14.exception.NotFoundException;
+import org.example.g14.exception.OrderInvalidException;
 import org.example.g14.model.Post;
 import org.example.g14.model.User;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.example.g14.utils.PostMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -55,7 +57,7 @@ public class PostService implements IPostService {
         }
 
         if (order != null && !order.isEmpty() && !order.equals("date_asc") && !order.equals("date_desc")) {
-            throw new BadRequestException("Tipo de orden inválido");
+            throw new OrderInvalidException(order);
         }
 
         LocalDate twoWeeksAgo = LocalDate.now().minusWeeks(2);

@@ -1,11 +1,9 @@
 package org.example.g14.service;
 
 import org.example.g14.dto.*;
-import org.example.g14.exception.BadRequestException;
-import org.example.g14.exception.NotFoundException;
+import org.example.g14.exception.*;
 import org.example.g14.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.g14.exception.ConflictException;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,7 @@ public class UserService implements IUserService, IUserServiceInternal {
     public UserWithFollowersCountDto countFollowersBySeller(int id) {
         User user = searchUserIfExists(id);
         if(postRepository.findAllByUser(user.getId()).isEmpty()){
-            throw new BadRequestException("El usuario con el ID:" + id + " no es un vendedor");
+            throw new NotSellerException(id);
         }
 
         return new UserWithFollowersCountDto(
@@ -44,14 +42,14 @@ public class UserService implements IUserService, IUserServiceInternal {
     public UserFollowedDto follow(int userId, int userIdToFollow) {
 
         if(userId == userIdToFollow){
-            throw new BadRequestException("No te podes seguir a vos mismo maquina");
+            throw new BadRequestException("Un usuario no se puede seguir a si mismo.");
         }
 
         User user = searchUserIfExists(userId);
         User userToFollow = searchUserIfExists(userIdToFollow);
 
         if(postRepository.findAllByUser(userIdToFollow).isEmpty()){
-            throw new BadRequestException("El usuario con el ID: " + userIdToFollow + " no es un vendedor");
+            throw new NotSellerException(userIdToFollow);
         }
 
         if(user.getIdFollows().contains(userIdToFollow)){
@@ -82,7 +80,7 @@ public class UserService implements IUserService, IUserServiceInternal {
                 orderEnum = NameOrder.valueOf(order.toUpperCase());
             }
             catch (IllegalArgumentException e){
-                throw new BadRequestException("Parametro de ordenamiento invalido");
+                throw new OrderInvalidException(order);
             }
         }
 
@@ -120,14 +118,14 @@ public class UserService implements IUserService, IUserServiceInternal {
                 orderEnum = NameOrder.valueOf(order.toUpperCase());
             }
             catch (IllegalArgumentException e){
-                throw new BadRequestException("Parametro de ordenamiento invalido");
+                throw new OrderInvalidException(order);
             }
         }
 
         User user = searchUserIfExists(id);
 
         if (postRepository.findAllByUser(id).isEmpty())
-            throw new BadRequestException("No es un vendedor");
+            throw new NotSellerException(id);
 
         UserFollowersDto userFollowersDto = new UserFollowersDto(user.getId(),
                 user.getName(),
@@ -194,7 +192,7 @@ public class UserService implements IUserService, IUserServiceInternal {
     public User searchUserIfExists(int id){
         Optional<User> user = userRepository.getById(id);
         if(user.isEmpty())
-            throw new NotFoundException("No se encontro el usuario");
+            throw new UserNotFoundException(id);
         return user.get();
     }
 }
