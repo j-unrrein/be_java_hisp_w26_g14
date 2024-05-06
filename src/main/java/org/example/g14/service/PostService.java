@@ -22,6 +22,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostService implements IPostService {
+
+    @Autowired
+    IUserServiceInternal userServiceInternal;
+
     @Autowired
     IPostRepository postRepository;
 
@@ -33,17 +37,15 @@ public class PostService implements IPostService {
         PostMapper postMapper = new PostMapper();
         Post post = postMapper.createPostDtoToPost(createPostDto);
 
-        Optional<User> usuario = userRepository.getById(post.getIdUser());
-        if(usuario.isEmpty()) {
-            throw new NotFoundException("No se encontró el usuario con id: " + post.getIdUser());
-        }
+        userServiceInternal.searchUserIfExists(post.getIdUser());
 
         postRepository.save(post);
     }
 
     @Override
     public List<PostDto> getPostsFromFollowed(int userId, String order) {
-        User user = userRepository.getById(userId).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        User user = userServiceInternal.searchUserIfExists(userId);
 
         List<Integer> followedVendors = user.getIdFollows();
 

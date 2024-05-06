@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService implements IUserService{
+public class UserService implements IUserService, IUserServiceInternal {
+
     @Autowired
     IUserRepository userRepository;
 
@@ -28,7 +29,7 @@ public class UserService implements IUserService{
 
     @Override
     public UserWithFollowersCountDto countFollowersBySeller(int id) {
-        User user = getUserById(id);
+        User user = searchUserIfExists(id);
         if(postRepository.findAllByUser(user.getId()).isEmpty()){
             throw new BadRequestException("El usuario con el ID:" + id + " no es un vendedor");
         }
@@ -46,8 +47,8 @@ public class UserService implements IUserService{
             throw new BadRequestException("No te podes seguir a vos mismo maquina");
         }
 
-        User user = getUserById(userId);
-        User userToFollow = getUserById(userIdToFollow);
+        User user = searchUserIfExists(userId);
+        User userToFollow = searchUserIfExists(userIdToFollow);
 
         if(postRepository.findAllByUser(userIdToFollow).isEmpty()){
             throw new BadRequestException("El usuario con el ID: " + userIdToFollow + " no es un vendedor");
@@ -85,7 +86,7 @@ public class UserService implements IUserService{
             }
         }
 
-        User user = getUserById(userId);
+        User user = searchUserIfExists(userId);
         UserFollowedDto usersDto = new UserFollowedDto();
 
         usersDto.setUser_id(user.getId());
@@ -93,7 +94,7 @@ public class UserService implements IUserService{
 
         List<UserDto> listFollowed = new ArrayList<>();
         for(int followed : user.getIdFollows()){
-            User foundUser = getUserById(followed);
+            User foundUser = searchUserIfExists(followed);
             UserDto followedUserDto = new UserDto();
             followedUserDto.setUser_name(foundUser.getName());
             followedUserDto.setUser_id(foundUser.getId());
@@ -123,7 +124,7 @@ public class UserService implements IUserService{
             }
         }
 
-        User user = getUserById(id);
+        User user = searchUserIfExists(id);
 
         if (postRepository.findAllByUser(id).isEmpty())
             throw new BadRequestException("No es un vendedor");
@@ -134,7 +135,7 @@ public class UserService implements IUserService{
         List<UserDto> userDtos = new ArrayList<>();
 
         for (Integer idUser : user.getIdFollowers()) {
-            UserDto userDto = transferToUserDto(getUserById(idUser));
+            UserDto userDto = transferToUserDto(searchUserIfExists(idUser));
             userDtos.add(userDto);
         }
 
@@ -151,10 +152,10 @@ public class UserService implements IUserService{
     @Override
     public UserFollowedDto unfollowSeller(int followerUserId, int sellerUserId) {
 
-        User followerUser = getUserById(followerUserId);
+        User followerUser = searchUserIfExists(followerUserId);
 
         // Check if Seller User exists
-        User sellerUser = getUserById(sellerUserId);
+        User sellerUser = searchUserIfExists(sellerUserId);
 
         // 'Integer.valueof' is needed because List.remove has an overload por a plain int parameter
         // that treats that parameter as an index in the List, not as the Object we are trying to remove.
@@ -179,7 +180,7 @@ public class UserService implements IUserService{
     private UserFollowedDto transferToUserFollowedDto(User user) {
 
         List<UserDto> followedUsers = user.getIdFollows().stream()
-            .map(this::getUserById)
+            .map(this::searchUserIfExists)
             .map(this::transferToUserDto)
             .toList();
 
@@ -190,7 +191,7 @@ public class UserService implements IUserService{
         );
     }
 
-    private User getUserById(int id){
+    public User searchUserIfExists(int id){
         Optional<User> user = userRepository.getById(id);
         if(user.isEmpty())
             throw new NotFoundException("No se encontro el usuario");
