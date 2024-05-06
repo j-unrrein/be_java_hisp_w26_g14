@@ -1,22 +1,22 @@
 package org.example.g14.service;
 
-import org.example.g14.dto.response.UserResponseDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.dto.response.UserFollowedResponseDto;
-import org.example.g14.dto.response.UserFollowersResponseDto;
 import org.example.g14.dto.response.UserFollowersCountResponseDto;
+import org.example.g14.dto.response.UserFollowersResponseDto;
+import org.example.g14.dto.response.UserResponseDto;
 import org.example.g14.exception.*;
 import org.example.g14.model.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.IUserRepository;
 import org.example.g14.utils.NameOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class UserService implements IUserService, IUserServiceInternal {
@@ -84,35 +84,25 @@ public class UserService implements IUserService, IUserServiceInternal {
         }
 
         User user = searchUserIfExists(userId);
-        UserFollowedResponseDto usersDto = new UserFollowedResponseDto();
-
-        usersDto.setUser_id(user.getId());
-        usersDto.setUser_name(user.getName());
-
-        List<UserResponseDto> listFollowed = new ArrayList<>();
-        for(int followed : user.getIdFollows()){
-            User foundUser = searchUserIfExists(followed);
-            UserResponseDto followedUserResponseDto = new UserResponseDto();
-            followedUserResponseDto.setUser_name(foundUser.getName());
-            followedUserResponseDto.setUser_id(foundUser.getId());
-            listFollowed.add(followedUserResponseDto);
-        }
+        Stream<UserResponseDto> userResponseDtoStream = user.getIdFollows().stream()
+                .map(this::searchUserIfExists)
+                .map(this::transferToUserDto);
 
         if(orderEnum == NameOrder.NAME_ASC)
-            listFollowed.sort(Comparator.comparing(UserResponseDto::getUser_name));
+            userResponseDtoStream = userResponseDtoStream.sorted(Comparator.comparing(UserResponseDto::getUser_name));
         else if (orderEnum == NameOrder.NAME_DESC)
-            listFollowed.sort(Comparator.comparing(UserResponseDto::getUser_name).reversed());
+            userResponseDtoStream = userResponseDtoStream.sorted(Comparator.comparing(UserResponseDto::getUser_name).reversed());
 
-        usersDto.setFollowed(listFollowed);
-
-        return usersDto;
+        return new UserFollowedResponseDto(user.getId(),
+                user.getName(),
+                userResponseDtoStream.toList());
     }
 
     @Override
     public UserFollowersResponseDto getAllFolowers(int id, String order) {
         NameOrder orderEnum = null;
 
-        if(order != null ){
+        if(order != null){
             try {
                 orderEnum = NameOrder.valueOf(order.toUpperCase());
             }
@@ -126,24 +116,18 @@ public class UserService implements IUserService, IUserServiceInternal {
         if (postRepository.findAllByUser(id).isEmpty())
             throw new NotSellerException(id);
 
-        UserFollowersResponseDto userFollowersResponseDto = new UserFollowersResponseDto(user.getId(),
-                user.getName(),
-                new ArrayList<>());
-        List<UserResponseDto> userResponseDtos = new ArrayList<>();
-
-        for (Integer idUser : user.getIdFollowers()) {
-            UserResponseDto userResponseDto = transferToUserDto(searchUserIfExists(idUser));
-            userResponseDtos.add(userResponseDto);
-        }
+        Stream<UserResponseDto> userResponseDtoStream = user.getIdFollowers().stream()
+            .map(this::searchUserIfExists)
+            .map(this::transferToUserDto);
 
         if(orderEnum == NameOrder.NAME_ASC)
-            userResponseDtos.sort(Comparator.comparing(UserResponseDto::getUser_name));
+            userResponseDtoStream = userResponseDtoStream.sorted(Comparator.comparing(UserResponseDto::getUser_name));
         else if (orderEnum == NameOrder.NAME_DESC)
-            userResponseDtos.sort(Comparator.comparing(UserResponseDto::getUser_name).reversed());
+            userResponseDtoStream = userResponseDtoStream.sorted(Comparator.comparing(UserResponseDto::getUser_name).reversed());
 
-        userFollowersResponseDto.setFollowers(userResponseDtos);
-
-        return userFollowersResponseDto;
+        return new UserFollowersResponseDto(user.getId(),
+                user.getName(),
+                userResponseDtoStream.toList());
     }
 
     @Override
