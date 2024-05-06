@@ -3,7 +3,7 @@ package org.example.g14.service;
 import org.example.g14.dto.request.PostCreateRequestDto;
 import org.example.g14.dto.response.MessageResponseDto;
 import org.example.g14.dto.response.PostResponseDto;
-import org.example.g14.dto.ProductDto;
+
 import org.example.g14.exception.OrderInvalidException;
 import org.example.g14.model.Post;
 import org.example.g14.model.User;
@@ -33,8 +33,7 @@ public class PostService implements IPostService {
 
     @Override
     public MessageResponseDto add(PostCreateRequestDto postCreateRequestDto) {
-        PostMapper postMapper = new PostMapper();
-        Post post = postMapper.createPostDtoToPost(postCreateRequestDto);
+        Post post = PostMapper.createPostDtoToPost(postCreateRequestDto);
 
         userServiceInternal.searchUserIfExists(post.getIdUser());
 
@@ -70,25 +69,7 @@ public class PostService implements IPostService {
         }
 
         return recentPosts.stream()
-                .map(post -> {
-
-                    ProductDto productDto = new ProductDto();
-                    productDto.setId(post.getProduct().getId());
-                    productDto.setName(post.getProduct().getName());
-                    productDto.setType(post.getProduct().getType());
-                    productDto.setBrand(post.getProduct().getBrand());
-                    productDto.setColor(post.getProduct().getColor());
-                    productDto.setNotes(post.getProduct().getNotes());
-
-                    return new PostResponseDto(
-                            post.getIdUser(),
-                            post.getId(),
-                            post.getDate(),
-                            productDto,
-                            post.getCategory(),
-                            post.getPrice()
-                    );
-                })
+                .map(PostMapper::postToPostResponseDto)
                 .collect(Collectors.toList());
     }
 }
