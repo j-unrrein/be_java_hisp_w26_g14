@@ -2,7 +2,6 @@ package service;
 
 import org.example.g14.dto.response.UserFollowedResponseDto;
 import org.example.g14.dto.response.UserFollowersResponseDto;
-import org.example.g14.dto.response.UserResponseDto;
 import org.example.g14.model.Post;
 import org.example.g14.model.Product;
 import org.example.g14.model.User;
@@ -17,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import utils.UsersList;
 
 import java.time.LocalDate;
@@ -25,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -48,16 +45,12 @@ public class UserServiceTest {
         User foundUser = new User(1, "Juan", List.of(2, 3, 4), new ArrayList<>());
         Post post = new Post(LocalDate.now(), 2.0, 3, new Product(), 2);
 
-        List<User> followers = UsersList.getMockedUsers();  // traer lista de usuarios de utils
+        List<User> followers = UsersList.getMockedUsers();
         List<Post> sellerPosts = new ArrayList<>();
         sellerPosts.add(post);
-
         List<User> sortedFollowers = followers.stream().sorted(Comparator.comparing(User::getName).reversed()).toList();
 
-        Mockito.when(userRepository.getById(1)).thenReturn(Optional.of(foundUser));
-        Mockito.when(userRepository.getById(2)).thenReturn(Optional.of(followers.get(0)));
-        Mockito.when(userRepository.getById(3)).thenReturn(Optional.of(followers.get(1)));
-        Mockito.when(userRepository.getById(4)).thenReturn(Optional.of(followers.get(2)));
+        stablishMocks(foundUser, followers);
 
         Mockito.when(postRepository.findAllByUser(1)).thenReturn(sellerPosts);
 
@@ -65,9 +58,9 @@ public class UserServiceTest {
         UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(1, "name_desc");
 
         //assert
-        Assertions.assertEquals(sortedFollowers.get(0).getName(), obtainedUsers.getFollowers().get(0).getUser_name());
-        Assertions.assertEquals(sortedFollowers.get(1).getName(), obtainedUsers.getFollowers().get(1).getUser_name());
-        Assertions.assertEquals(sortedFollowers.get(2).getName(), obtainedUsers.getFollowers().get(2).getUser_name());
+        for (int index = 0; index < sortedFollowers.size(); index++) {
+            Assertions.assertEquals(sortedFollowers.get(index).getName(), obtainedUsers.getFollowers().get(index).getUser_name());
+        }
     }
 
     @Test
@@ -78,16 +71,12 @@ public class UserServiceTest {
         User foundUser = new User(1, "Juan", List.of(2, 3, 4), new ArrayList<>());
         Post post = new Post(LocalDate.now(), 2.0, 3, new Product(), 2);
 
-        List<User> followers = UsersList.getMockedUsers();  // traer lista de usuarios de utils
+        List<User> followers = UsersList.getMockedUsers();
         List<Post> sellerPosts = new ArrayList<>();
         sellerPosts.add(post);
-
         List<User> sortedFollowers = followers.stream().sorted(Comparator.comparing(User::getName)).toList();
 
-        Mockito.when(userRepository.getById(1)).thenReturn(Optional.of(foundUser));
-        Mockito.when(userRepository.getById(2)).thenReturn(Optional.of(followers.get(0)));
-        Mockito.when(userRepository.getById(3)).thenReturn(Optional.of(followers.get(1)));
-        Mockito.when(userRepository.getById(4)).thenReturn(Optional.of(followers.get(2)));
+        stablishMocks(foundUser, followers);
 
         Mockito.when(postRepository.findAllByUser(1)).thenReturn(sellerPosts);
 
@@ -95,9 +84,9 @@ public class UserServiceTest {
         UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(1, "name_asc");
 
         //assert
-        Assertions.assertEquals(sortedFollowers.get(0).getName(), obtainedUsers.getFollowers().get(0).getUser_name());
-        Assertions.assertEquals(sortedFollowers.get(1).getName(), obtainedUsers.getFollowers().get(1).getUser_name());
-        Assertions.assertEquals(sortedFollowers.get(2).getName(), obtainedUsers.getFollowers().get(2).getUser_name());
+        for (int index = 0; index < sortedFollowers.size(); index++) {
+            Assertions.assertEquals(sortedFollowers.get(index).getName(), obtainedUsers.getFollowers().get(index).getUser_name());
+        }
     }
 
     @Test
@@ -107,23 +96,19 @@ public class UserServiceTest {
         // arrange
         User foundUser = new User(1, "Juan", new ArrayList<>(), List.of(2, 3, 4));
 
-        List<User> followeds = UsersList.getMockedUsers();  // traer lista de usuarios de utils
+        List<User> followeds = UsersList.getMockedUsers();
+        List<User> sortedFolloweds = followeds.stream().sorted(Comparator.comparing(User::getName).reversed()).toList();
 
-        List<User> sortedFollowers = followeds.stream().sorted(Comparator.comparing(User::getName).reversed()).toList();
-
-        Mockito.when(userRepository.getById(1)).thenReturn(Optional.of(foundUser));
-        Mockito.when(userRepository.getById(2)).thenReturn(Optional.of(followeds.get(0)));
-        Mockito.when(userRepository.getById(3)).thenReturn(Optional.of(followeds.get(1)));
-        Mockito.when(userRepository.getById(4)).thenReturn(Optional.of(followeds.get(2)));
-
+        stablishMocks(foundUser, followeds);
 
         // act
         UserFollowedResponseDto obtainedUsers = userService.getListOfFollowedSellers(1, "name_desc");
 
         //assert
-        Assertions.assertEquals(sortedFollowers.get(0).getName(), obtainedUsers.getFollowed().get(0).getUser_name());
-        Assertions.assertEquals(sortedFollowers.get(1).getName(), obtainedUsers.getFollowed().get(1).getUser_name());
-        Assertions.assertEquals(sortedFollowers.get(2).getName(), obtainedUsers.getFollowed().get(2).getUser_name());
+        for (int index = 0; index < sortedFolloweds.size(); index++) {
+            Assertions.assertEquals(sortedFolloweds.get(index).getName(),
+                                    obtainedUsers.getFollowed().get(index).getUser_name());
+        }
     }
 
     @Test
@@ -133,22 +118,25 @@ public class UserServiceTest {
         // arrange
         User foundUser = new User(1, "Juan", new ArrayList<>(), List.of(2, 3, 4));
 
-        List<User> followeds = UsersList.getMockedUsers();  // traer lista de usuarios de utils
+        List<User> followeds = UsersList.getMockedUsers();
+        List<User> sortedFolloweds = followeds.stream().sorted(Comparator.comparing(User::getName)).toList();
 
-        List<User> sortedFollowers = followeds.stream().sorted(Comparator.comparing(User::getName)).toList();
-
-        Mockito.when(userRepository.getById(1)).thenReturn(Optional.of(foundUser));
-        Mockito.when(userRepository.getById(2)).thenReturn(Optional.of(followeds.get(0)));
-        Mockito.when(userRepository.getById(3)).thenReturn(Optional.of(followeds.get(1)));
-        Mockito.when(userRepository.getById(4)).thenReturn(Optional.of(followeds.get(2)));
-
+        stablishMocks(foundUser, followeds);
 
         // act
         UserFollowedResponseDto obtainedUsers = userService.getListOfFollowedSellers(1, "name_asc");
 
         //assert
-        Assertions.assertEquals(sortedFollowers.get(0).getName(), obtainedUsers.getFollowed().get(0).getUser_name());
-        Assertions.assertEquals(sortedFollowers.get(1).getName(), obtainedUsers.getFollowed().get(1).getUser_name());
-        Assertions.assertEquals(sortedFollowers.get(2).getName(), obtainedUsers.getFollowed().get(2).getUser_name());
+        for (int index = 0; index < sortedFolloweds.size(); index++) {
+            Assertions.assertEquals(sortedFolloweds.get(index).getName(),
+                                    obtainedUsers.getFollowed().get(index).getUser_name());
+        }
+    }
+
+    private void stablishMocks(User foundUser, List<User> relatedUsers){
+        Mockito.when(userRepository.getById(1)).thenReturn(Optional.of(foundUser));
+        for (User user : relatedUsers) {
+            Mockito.when(userRepository.getById(user.getId())).thenReturn(Optional.of(user));
+        }
     }
 }
