@@ -8,8 +8,10 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestControllerAdvice
@@ -43,14 +45,35 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<MessageResponseDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 
         List<String> detail = e.getFieldErrors().stream()
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .toList();
 
         return ResponseEntity.badRequest().body(new MessageResponseDto(
-            "Hubo algún error de validación en los datos de la petición.",
+            "Hubo algún error de validación en los datos pasados en en el cuerpo de la petición.",
+            detail
+        ));
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<MessageResponseDto> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
+
+        List<String> detail = new ArrayList<>();
+
+        for (var result : e.getAllValidationResults()) {
+            for (var error : result.getResolvableErrors()) {
+                detail.add(
+                    result.getMethodParameter().getParameterName()
+                    + ": "
+                    + error.getDefaultMessage()
+                );
+            }
+        }
+
+        return ResponseEntity.badRequest().body(new MessageResponseDto(
+            "Hubo algún error de validación en algún parámetro de Path de la petición.",
             detail
         ));
     }
