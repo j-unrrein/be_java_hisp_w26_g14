@@ -1,10 +1,11 @@
 package org.example.g14.controller;
 
+import jakarta.validation.Valid;
 import org.example.g14.dto.request.PostCreateRequestDto;
+import org.example.g14.dto.response.MessageResponseDto;
 import org.example.g14.dto.response.PostResponseDto;
 import org.example.g14.service.IPostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +18,10 @@ public class ProductController {
     IPostService postService;
 
     @PostMapping("/post")
-    public ResponseEntity<?> createPost(
-        @RequestBody PostCreateRequestDto postCreateRequestDto
+    public ResponseEntity<MessageResponseDto> createPost(
+        @RequestBody @Valid PostCreateRequestDto postCreateRequestDto
     ) {
-        return new ResponseEntity<>(postService.
-                add(postCreateRequestDto), HttpStatus.OK);
+        return ResponseEntity.ok(postService.add(postCreateRequestDto));
     }
 
     @GetMapping("/followed/{user_id}/list")
