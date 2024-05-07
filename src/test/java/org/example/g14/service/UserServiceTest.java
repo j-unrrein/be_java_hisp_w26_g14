@@ -70,12 +70,7 @@ public class UserServiceTest {
         int userIdToFollow = 36;
 
         when(userRepository.getById(userId)).thenReturn(Optional.of(
-            User.builder()
-                .id(userId)
-                .name("John Doe")
-                .idFollowers(new ArrayList<>())
-                .idFollows(new ArrayList<>())
-                .build()
+            User.builder().id(userId).build()
         ));
         when(userRepository.getById(userIdToFollow)).thenReturn(Optional.empty());
 
