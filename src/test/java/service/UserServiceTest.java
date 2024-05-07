@@ -36,7 +36,6 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-
     @Test
     @DisplayName("US 0003 - NAME_DESC OK")
     public void getAllFolowersDescTest() {
@@ -58,9 +57,7 @@ public class UserServiceTest {
         UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(1, "name_desc");
 
         //assert
-        for (int index = 0; index < sortedFollowers.size(); index++) {
-            Assertions.assertEquals(sortedFollowers.get(index).getName(), obtainedUsers.getFollowers().get(index).getUser_name());
-        }
+        assertionsFeature0003(sortedFollowers, obtainedUsers);
     }
 
     @Test
@@ -84,9 +81,7 @@ public class UserServiceTest {
         UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(1, "name_asc");
 
         //assert
-        for (int index = 0; index < sortedFollowers.size(); index++) {
-            Assertions.assertEquals(sortedFollowers.get(index).getName(), obtainedUsers.getFollowers().get(index).getUser_name());
-        }
+        assertionsFeature0003(sortedFollowers, obtainedUsers);
     }
 
     @Test
@@ -105,10 +100,7 @@ public class UserServiceTest {
         UserFollowedResponseDto obtainedUsers = userService.getListOfFollowedSellers(1, "name_desc");
 
         //assert
-        for (int index = 0; index < sortedFolloweds.size(); index++) {
-            Assertions.assertEquals(sortedFolloweds.get(index).getName(),
-                                    obtainedUsers.getFollowed().get(index).getUser_name());
-        }
+        assertionsFeature0004(sortedFolloweds, obtainedUsers);
     }
 
     @Test
@@ -127,16 +119,27 @@ public class UserServiceTest {
         UserFollowedResponseDto obtainedUsers = userService.getListOfFollowedSellers(1, "name_asc");
 
         //assert
-        for (int index = 0; index < sortedFolloweds.size(); index++) {
-            Assertions.assertEquals(sortedFolloweds.get(index).getName(),
-                                    obtainedUsers.getFollowed().get(index).getUser_name());
-        }
+        assertionsFeature0004(sortedFolloweds, obtainedUsers);
     }
 
     private void stablishMocks(User foundUser, List<User> relatedUsers){
         Mockito.when(userRepository.getById(1)).thenReturn(Optional.of(foundUser));
         for (User user : relatedUsers) {
             Mockito.when(userRepository.getById(user.getId())).thenReturn(Optional.of(user));
+        }
+    }
+
+    private void assertionsFeature0003(List<User> sortedFollowers, UserFollowersResponseDto obtainedUsers){
+        for (int index = 0; index < sortedFollowers.size(); index++) {
+            Assertions.assertEquals(sortedFollowers.get(index).getName(),
+                    obtainedUsers.getFollowers().get(index).getUser_name());
+        }
+    }
+
+    private void assertionsFeature0004(List<User> sortedFolloweds, UserFollowedResponseDto obtainedUsers){
+        for (int index = 0; index < sortedFolloweds.size(); index++) {
+            Assertions.assertEquals(sortedFolloweds.get(index).getName(),
+                    obtainedUsers.getFollowed().get(index).getUser_name());
         }
     }
 }
