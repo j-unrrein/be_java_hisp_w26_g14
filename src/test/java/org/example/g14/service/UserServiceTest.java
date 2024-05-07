@@ -1,11 +1,13 @@
 package org.example.g14.service;
 
 import org.example.g14.dto.response.UserFollowedResponseDto;
+import org.example.g14.dto.response.UserFollowersCountResponseDto;
 import org.example.g14.dto.response.UserResponseDto;
+import org.example.g14.exception.NotSellerException;
 import org.example.g14.exception.UserNotFoundException;
 import org.example.g14.model.Post;
 import org.example.g14.model.User;
-import org.example.g14.repository.PostRepository;
+import org.example.g14.repository.IPostRepository;
 import org.example.g14.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,11 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +27,7 @@ public class UserServiceTest {
     @Mock
     UserRepository userRepository;
     @Mock
-    PostRepository postRepository;
+    IPostRepository postRepository;
     @InjectMocks
     UserService userService;
 
@@ -79,5 +80,39 @@ public class UserServiceTest {
             UserNotFoundException.class,
             () -> userService.follow(userId, userIdToFollow)
         );
+    }
+
+    @Test
+    public void testCountFollowersBySeller_NoPosts_ThrowsNotSellerException() {
+        // Arrange
+        int userId = 1;
+        User user = new User();
+        user.setId(userId);
+        user.setIdFollowers(Collections.singletonList(2));
+        when(postRepository.findAllByUser(userId)).thenReturn(Collections.emptyList());
+        when(userRepository.getById(userId)).thenReturn(Optional.of(user));
+
+        // Act & Assert
+        assertThrows(NotSellerException.class, () -> userService.countFollowersBySeller(userId));
+    }
+
+    @Test
+    public void testCountFollowersBySeller_WithPosts_ReturnsCorrectCount() {
+        // Arrange
+        int userId = 1;
+        User user = new User();
+        user.setId(userId);
+        user.setName("Test User");
+        user.setIdFollowers(List.of(2, 3, 4));
+        when(postRepository.findAllByUser(userId)).thenReturn(Collections.singletonList(new Post()));
+        when(userRepository.getById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        UserFollowersCountResponseDto response = userService.countFollowersBySeller(userId);
+
+        // Assert
+        assertEquals(userId, response.getUser_id());
+        assertEquals("Test User", response.getUser_name());
+        assertEquals(3, response.getFollowers_count());
     }
 }
