@@ -38,26 +38,21 @@ public class UserServiceTest {
 
         User user = User.builder()
             .id(userId)
-            .name("John Doe")
-            .idFollowers(new ArrayList<>())
             .idFollows(new ArrayList<>())
             .build();
         User userToFollow = User.builder()
             .id(userIdToFollow)
-            .name("Aria Sanchez")
             .idFollowers(new ArrayList<>())
-            .idFollows(new ArrayList<>())
             .build();
 
         when(userRepository.getById(userId)).thenReturn(Optional.of(user));
         when(userRepository.getById(userIdToFollow)).thenReturn(Optional.of(userToFollow));
         when(postRepository.findAllByUser(userIdToFollow)).thenReturn(List.of(new Post()));
 
-        UserFollowedResponseDto expectedResponse = new UserFollowedResponseDto(
-            userId,
-            "John Doe",
-            new ArrayList<>(List.of(new UserResponseDto(20, "Aria Sanchez")))
-        );
+        UserFollowedResponseDto expectedResponse = UserFollowedResponseDto.builder()
+            .user_id(userId)
+            .followed(List.of(UserResponseDto.builder().user_id(20).build()))
+            .build();
 
         // Act
         UserFollowedResponseDto response = userService.follow(userId, userIdToFollow);
