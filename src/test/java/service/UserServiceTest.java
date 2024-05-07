@@ -69,4 +69,34 @@ public class UserServiceTest {
         Assertions.assertEquals(sortedFollowers.get(1).getName(), obtainedUsers.getFollowers().get(1).getUser_name());
         Assertions.assertEquals(sortedFollowers.get(2).getName(), obtainedUsers.getFollowers().get(2).getUser_name());
     }
+
+    @Test
+    @DisplayName("US 0003 - NAME_ASC OK")
+    public void getAllFolowersAscTest() {
+
+        // arrange
+        User foundUser = new User(1, "Juan", List.of(2, 3, 4), new ArrayList<>());
+        Post post = new Post(LocalDate.now(), 2.0, 3, new Product(), 2);
+
+        List<User> followers = UsersList.getMockedUsers();  // traer lista de usuarios de utils
+        List<Post> sellerPosts = new ArrayList<>();
+        sellerPosts.add(post);
+
+        List<User> sortedFollowers = followers.stream().sorted(Comparator.comparing(User::getName)).toList();
+
+        Mockito.when(userRepository.getById(1)).thenReturn(Optional.of(foundUser));
+        Mockito.when(userRepository.getById(2)).thenReturn(Optional.of(followers.get(0)));
+        Mockito.when(userRepository.getById(3)).thenReturn(Optional.of(followers.get(1)));
+        Mockito.when(userRepository.getById(4)).thenReturn(Optional.of(followers.get(2)));
+
+        Mockito.when(postRepository.findAllByUser(1)).thenReturn(sellerPosts);
+
+        // act
+        UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(1, "name_asc");
+
+        //assert
+        Assertions.assertEquals(sortedFollowers.get(0).getName(), obtainedUsers.getFollowers().get(0).getUser_name());
+        Assertions.assertEquals(sortedFollowers.get(1).getName(), obtainedUsers.getFollowers().get(1).getUser_name());
+        Assertions.assertEquals(sortedFollowers.get(2).getName(), obtainedUsers.getFollowers().get(2).getUser_name());
+    }
 }
