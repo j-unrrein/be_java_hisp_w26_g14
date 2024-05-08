@@ -1,8 +1,10 @@
 package org.example.g14.dto.response;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class UserFollowersCountResponseDto extends UserResponseDto {
     private int followers_count;
 

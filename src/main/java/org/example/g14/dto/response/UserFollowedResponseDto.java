@@ -1,14 +1,15 @@
 package org.example.g14.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 public class UserFollowedResponseDto extends UserResponseDto {
     private List<UserResponseDto> followed;
 
