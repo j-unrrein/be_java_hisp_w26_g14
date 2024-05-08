@@ -129,12 +129,11 @@ public class PostServiceTest {
         // Arrange
         int userId = 1;
         int sellerId = 2;
-        String order = "date_desc";
 
         User user = new User();
         user.setId(userId);
         List<Integer> followedSellers = new ArrayList<>();
-        followedSellers.add(2);
+        followedSellers.add(sellerId);
         user.setIdFollows(followedSellers);
         when(iUserServiceInternal.searchUserIfExists(userId)).thenReturn(user);
 
@@ -143,20 +142,20 @@ public class PostServiceTest {
         postWithinLastTwoWeeks.setId(1);
         postWithinLastTwoWeeks.setIdUser(sellerId);
         postWithinLastTwoWeeks.setDate(LocalDate.now().minusDays(7)); // Within last two weeks
-        postWithinLastTwoWeeks.setProduct(new Product(1,"product 1", "type 1", "brand 1", "color 1", "note 1" ));
+        postWithinLastTwoWeeks.setProduct(new Product());
 
         Post postOutsideLastTwoWeeks = new Post();
         postOutsideLastTwoWeeks.setId(2);
         postOutsideLastTwoWeeks.setIdUser(sellerId);
         postOutsideLastTwoWeeks.setDate(LocalDate.now().minusDays(15)); // Outside last two weeks
-        postOutsideLastTwoWeeks.setProduct(new Product(2,"product 2", "type 2", "brand 2", "color 2", "note 2" ));
+        postOutsideLastTwoWeeks.setProduct(new Product());
 
         List<Post> posts = List.of(postWithinLastTwoWeeks, postOutsideLastTwoWeeks);
 
         when(repository.findAllByUser(2)).thenReturn(posts);
 
         // Act
-        List<PostResponseDto> result = service.getPostsFromFollowed(userId, order);
+        List<PostResponseDto> result = service.getPostsFromFollowed(userId, null);
 
         // Assert
         assertEquals(1, result.size());
