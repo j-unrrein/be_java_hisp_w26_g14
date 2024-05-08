@@ -52,7 +52,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("US-0009 Verificar que el tipo de ordenamiento por fecha exista. OK")
+    @DisplayName("T-0005: US-0009 el tipo de ordenamiento por fecha existe")
     public void getPostsFromFollowedTestOk(){
         initializeFeature0005();
         List<PostResponseDto> result_asc = service.getPostsFromFollowed(2, "date_asc");
@@ -64,7 +64,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("US-0009 Verificar que el tipo de ordenamiento por fecha exista. BAD REQUEST")
+    @DisplayName("T-0005: US-0009 el tipo de ordenamiento por fecha no existe")
     public void getPostsFromFollowedTestBadRequest() {
         initializeFeature0005();
         // assert
@@ -78,7 +78,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("US-0009 - ordenamiento descendente correcto")
+    @DisplayName("T-0006: US-0009 el ordenamiento con date_desc está correcto")
     public void getPostsFromFollowedDescOk(){
         //arrange
         String order = "date_desc";
@@ -92,7 +92,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("US-0009 - ordenamiento ascendente correcto")
+    @DisplayName("T-0006: US-0009 el ordenamiento con date_desc está correcto\"")
     public void getPostsFromFollowedAscOk(){
         //arrange
         String order = "date_asc";
@@ -124,7 +124,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("US-0006 verificar que traigan post de las ultimas 2 semanas")
+    @DisplayName("T-0008: US-0006 verificar que traigan post de las ultimas 2 semanas")
     public void testGetPostsFromFollowedWithinLastTwoWeeks() {
         // Arrange
         int userId = 1;
