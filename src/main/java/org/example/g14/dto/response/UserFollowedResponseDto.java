@@ -1,6 +1,7 @@
 package org.example.g14.dto.response;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -8,10 +9,10 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class UserFollowedResponseDto extends UserResponseDto {
     private List<UserResponseDto> followed;
 
-    @Builder
     public UserFollowedResponseDto(int user_id, String user_name, List<UserResponseDto> followed) {
         super(user_id, user_name);
         this.followed = followed;
