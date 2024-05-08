@@ -6,9 +6,9 @@ import lombok.experimental.SuperBuilder;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 public class UserFollowedResponseDto extends UserResponseDto {
     private List<UserResponseDto> followed;
