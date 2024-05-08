@@ -80,7 +80,7 @@ class UserServiceTest {
 
         Throwable thrown = catchThrowable(() -> userService.unfollowSeller(followerUserId, followedUserId));
 
-        verify(userRepository, never()).save(followerUser);
+        verify(userRepository, never()).save(any());
 
         assertThat(thrown)
             .isInstanceOf(UserNotFoundException.class)
