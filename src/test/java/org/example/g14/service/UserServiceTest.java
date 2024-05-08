@@ -1,4 +1,4 @@
-package service;
+package org.example.g14.service;
 
 import org.example.g14.dto.response.UserFollowedResponseDto;
 import org.example.g14.dto.response.UserFollowersResponseDto;

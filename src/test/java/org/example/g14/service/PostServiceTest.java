@@ -1,4 +1,4 @@
-package service;
+package org.example.g14.service;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
