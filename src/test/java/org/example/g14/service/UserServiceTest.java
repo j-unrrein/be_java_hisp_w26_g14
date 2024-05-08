@@ -147,7 +147,7 @@ public class UserServiceTest {
         UserFollowedResponseDto result = userService.getListOfFollowedSellers(userId, order);
 
         //Assert
-        Assertions.assertNotNull(result, "El test por orden ascendente en getListOfFollowedSellers finalizó con éxito");
+        Assertions.assertNotNull(result);
     }
 
     @Test

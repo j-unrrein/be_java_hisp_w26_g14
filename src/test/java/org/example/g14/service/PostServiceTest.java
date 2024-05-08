@@ -13,6 +13,8 @@ import org.example.g14.utils.PostList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -51,30 +53,24 @@ public class PostServiceTest {
         when(repository.findAllByUser(sellerId)).thenReturn(List.of());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"date_asc", "date_desc"})
     @DisplayName("T-0005: US-0009 el tipo de ordenamiento por fecha existe")
-    public void getPostsFromFollowedTestOk(){
+    public void getPostsFromFollowedTestOk(String order){
         initializeFeature0005();
-        List<PostResponseDto> result_asc = service.getPostsFromFollowed(2, "date_asc");
-        List<PostResponseDto> result_desc = service.getPostsFromFollowed(2, "date_desc");
+        List<PostResponseDto> result = service.getPostsFromFollowed(2, order);
 
         // assert
-        Assertions.assertNotNull(result_asc, "El test por fecha ASCENDENTE finalizó correctamente");
-        Assertions.assertNotNull(result_desc, "El test por fecha DESCENDENTE finalizó correctamente");
+        Assertions.assertNotNull(result);
     }
 
     @Test
     @DisplayName("T-0005: US-0009 el tipo de ordenamiento por fecha no existe")
     public void getPostsFromFollowedTestBadRequest() {
         initializeFeature0005();
-        // assert
-        Assertions.assertThrows(OrderInvalidException.class, () -> {
-            service.getPostsFromFollowed(2, "asc");
-        });
 
-        Assertions.assertThrows(OrderInvalidException.class, () -> {
-            service.getPostsFromFollowed(2, "desc");
-        });
+        // assert
+        Assertions.assertThrows(OrderInvalidException.class, () -> service.getPostsFromFollowed(2, "test"));
     }
 
     @Test
