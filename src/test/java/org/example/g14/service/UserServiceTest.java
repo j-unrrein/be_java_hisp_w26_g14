@@ -16,6 +16,8 @@ import org.example.g14.repository.IPostRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -133,67 +135,56 @@ public class UserServiceTest {
         assertEquals(3, response.getFollowers_count());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"name_asc", "name_desc"})
     @DisplayName("T-0003: US-0008 el tipo de ordenamiento existe en getListOfFollowedSellers")
-    void testTypeOfOrderExistInGetListOfFollowedSellers() {
+    void testTypeOfOrderExistInGetListOfFollowedSellers(String order) {
         //Arrange
-        String orderDesc = "name_desc";
-        String orderAsc = "name_asc";
         int userId = 1;
-        User user = new User(1, "Juan", List.of(), List.of(1));
+        User user = new User(userId, "Juan", List.of(), List.of(1));
         //Act
-        when(userRepository.getById(1)).thenReturn(java.util.Optional.of(user));
-
-        UserFollowedResponseDto resultAscFollowed = userService.getListOfFollowedSellers(userId, orderAsc);
-        UserFollowedResponseDto resultDescFollowed = userService.getListOfFollowedSellers(userId, orderDesc);
+        when(userRepository.getById(userId)).thenReturn(java.util.Optional.of(user));
+        UserFollowedResponseDto result = userService.getListOfFollowedSellers(userId, order);
 
         //Assert
-        Assertions.assertNotNull(resultAscFollowed, "El test por orden ascendente en getListOfFollowedSellers finalizó con éxito");
-        Assertions.assertNotNull(resultDescFollowed, "El test por orden descendente en getListOfFollowedSellers finalizó con éxito");
+        Assertions.assertNotNull(result, "El test por orden ascendente en getListOfFollowedSellers finalizó con éxito");
     }
 
     @Test
     @DisplayName("T-0003: US-0008 el tipo de ordenamiento no existe en getListOfFollowedSellers")
     void testTypeOfOrderNotExistInGetListOfFollowedSellers() {
         //Arrange
-        String orderDesc = "desc";
-        String orderAsc = "asc";
         int userId = 1;
+        String order = "desc";
 
-        Assertions.assertThrows(OrderInvalidException.class, () -> userService.getListOfFollowedSellers(userId, orderAsc));
-        Assertions.assertThrows(OrderInvalidException.class, () -> userService.getListOfFollowedSellers(userId, orderDesc));
+        Assertions.assertThrows(OrderInvalidException.class, () -> userService.getListOfFollowedSellers(userId, order));
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"name_asc", "name_desc"})
     @DisplayName("T-0003: US-0008 el tipo de ordenamiento existe en getAllFollowers")
-    void testTypeOfOrderExistInGetAllFollowers() {
+    void testTypeOfOrderExistInGetAllFollowers(String order) {
         //Arrange
-        String orderDesc = "name_desc";
-        String orderAsc = "name_asc";
         int userId = 1;
-        User user = new User(1, "Juan", List.of(), List.of());
+        User user = new User(userId, "Juan", List.of(), List.of());
         //Act
         when(userRepository.getById(userId)).thenReturn(java.util.Optional.of(user));
         when(postRepository.findAllByUser(userId)).thenReturn(List.of(new Post()));
 
-        UserFollowersResponseDto resultAscFollowers = userService.getAllFolowers(userId, orderAsc);
-        UserFollowersResponseDto resultDescFollowers = userService.getAllFolowers(userId, orderDesc);
+        UserFollowersResponseDto resultAscFollowers = userService.getAllFolowers(userId, order);
 
         //Assert
-        Assertions.assertNotNull(resultAscFollowers, "El test por orden ascendente en getAllFolowers finalizó con éxito");
-        Assertions.assertNotNull(resultDescFollowers, "El test por orden descendente en getAllFolowers finalizó con éxito");
+        Assertions.assertNotNull(resultAscFollowers);
     }
 
     @Test
     @DisplayName("T-0003: US-0008 el tipo de ordenamiento no existe en getAllFollowers. BAD REQUEST")
     void testTypeOfOrderNotExistInGetAllFollowers() {
         //Arrange
-        String orderDesc = "desc";
-        String orderAsc = "asc";
+        String order = "asc";
         int userId = 1;
 
-        Assertions.assertThrows(OrderInvalidException.class, () -> userService.getAllFolowers(userId, orderAsc));
-        Assertions.assertThrows(OrderInvalidException.class, () -> userService.getAllFolowers(userId, orderDesc));
+        Assertions.assertThrows(OrderInvalidException.class, () -> userService.getAllFolowers(userId, order));
     }
 
     @Test
