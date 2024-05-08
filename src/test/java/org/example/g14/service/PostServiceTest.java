@@ -128,28 +128,31 @@ public class PostServiceTest {
     public void testGetPostsFromFollowedWithinLastTwoWeeks() {
         // Arrange
         int userId = 1;
+        int sellerId = 2;
         String order = "date_desc";
 
         User user = new User();
         user.setId(userId);
-        List<Integer> followedVendors = new ArrayList<>();
-        followedVendors.add(2);
-        user.setIdFollows(followedVendors);
+        List<Integer> followedSellers = new ArrayList<>();
+        followedSellers.add(2);
+        user.setIdFollows(followedSellers);
         when(iUserServiceInternal.searchUserIfExists(userId)).thenReturn(user);
 
-        List<Post> posts = new ArrayList<>();
-        Post post1 = new Post();
-        post1.setId(1);
-        post1.setIdUser(2);
-        post1.setDate(LocalDate.now().minusDays(7)); // Within last two weeks
-        post1.setProduct(new Product(1,"product 1", "type 1", "brand 1", "color 1", "note 1" ));
-        posts.add(post1);
-        Post post2 = new Post();
-        post2.setId(2);
-        post2.setIdUser(2);
-        post2.setDate(LocalDate.now().minusDays(15)); // Outside last two weeks
-        post2.setProduct(new Product(2,"product 2", "type 2", "brand 2", "color 2", "note 2" ));
-        posts.add(post2);
+
+        Post postWithinLastTwoWeeks = new Post();
+        postWithinLastTwoWeeks.setId(1);
+        postWithinLastTwoWeeks.setIdUser(sellerId);
+        postWithinLastTwoWeeks.setDate(LocalDate.now().minusDays(7)); // Within last two weeks
+        postWithinLastTwoWeeks.setProduct(new Product(1,"product 1", "type 1", "brand 1", "color 1", "note 1" ));
+
+        Post postOutsideLastTwoWeeks = new Post();
+        postOutsideLastTwoWeeks.setId(2);
+        postOutsideLastTwoWeeks.setIdUser(sellerId);
+        postOutsideLastTwoWeeks.setDate(LocalDate.now().minusDays(15)); // Outside last two weeks
+        postOutsideLastTwoWeeks.setProduct(new Product(2,"product 2", "type 2", "brand 2", "color 2", "note 2" ));
+
+        List<Post> posts = List.of(postWithinLastTwoWeeks, postOutsideLastTwoWeeks);
+
         when(repository.findAllByUser(2)).thenReturn(posts);
 
         // Act
@@ -157,6 +160,6 @@ public class PostServiceTest {
 
         // Assert
         assertEquals(1, result.size());
-        assertEquals(1, result.get(0).getPost_id());
+        assertEquals(postWithinLastTwoWeeks.getId(), result.get(0).getPost_id());
     }
 }
