@@ -45,6 +45,7 @@ public class UserServiceTest {
 
 
     @Test
+    @DisplayName("T-0001: US-0001 el usuario a seguir existe")
     public void userToFollowExists() {
         // Arrange
         int userId = 1;
@@ -78,6 +79,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("T-0001: US-0001 el usuario a seguir no existe")
     public void userToFollowDoesntExist() {
         // Arrange
         int userId = 1;
@@ -96,6 +98,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("T-0007: US-0002 usuario a contar seguidores no es vendedor")
     public void testCountFollowersBySeller_NoPosts_ThrowsNotSellerException() {
         // Arrange
         int userId = 1;
@@ -110,6 +113,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("T-0007: US-0002 cantidad de seguidores de un vendedor")
     public void testCountFollowersBySeller_WithPosts_ReturnsCorrectCount() {
         // Arrange
         int userId = 1;
@@ -130,7 +134,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("US-0008: Verificar que el tipo de ordenamiento exista en getListOfFollowedSellers. OK")
+    @DisplayName("T-0003: US-0008 el tipo de ordenamiento existe en getListOfFollowedSellers")
     void testTypeOfOrderExistInGetListOfFollowedSellers() {
         //Arrange
         String orderDesc = "name_desc";
@@ -149,7 +153,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("US-0008: Verificar que el tipo de ordenamiento no exista en getListOfFollowedSellers. BAD REQUEST")
+    @DisplayName("T-0003: US-0008 el tipo de ordenamiento no existe en getListOfFollowedSellers")
     void testTypeOfOrderNotExistInGetListOfFollowedSellers() {
         //Arrange
         String orderDesc = "desc";
@@ -161,7 +165,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("US-0008: Verificar que el tipo de ordenamiento exista en getAllFollowers. OK")
+    @DisplayName("T-0003: US-0008 el tipo de ordenamiento existe en getAllFollowers")
     void testTypeOfOrderExistInGetAllFollowers() {
         //Arrange
         String orderDesc = "name_desc";
@@ -181,7 +185,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("US-0008: Verificar que el tipo de ordenamiento no exista en getAllFollowers. BAD REQUEST")
+    @DisplayName("T-0003: US-0008 el tipo de ordenamiento no existe en getAllFollowers. BAD REQUEST")
     void testTypeOfOrderNotExistInGetAllFollowers() {
         //Arrange
         String orderDesc = "desc";
@@ -193,7 +197,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Tanto el Usuario que sigue como el Usuario a dejar de seguir existen")
+    @DisplayName("T-0002: US-0007 el usuario a dejar de seguir existe")
     void unfollowSellerOk() {
 
         int followerUserId = 1;
@@ -228,7 +232,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("El Usuario que sigue existe, pero el Usuario a dejar de seguir no existe")
+    @DisplayName("T-0002: US-0007 el usuario a dejar de seguir no existe")
     void unfollowSellerFollowedUserDoesntExist() {
 
         int followerUserId = 1;
@@ -249,7 +253,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("US 0003 - NAME_DESC OK")
+    @DisplayName("T-0004: US-0003 el ordenamiento con name_desc está correcto")
     public void getAllFolowersDescTest() {
 
         // arrange
@@ -263,17 +267,17 @@ public class UserServiceTest {
 
         stablishMocks(foundUser, followers);
 
-        Mockito.when(postRepository.findAllByUser(1)).thenReturn(sellerPosts);
+        Mockito.when(postRepository.findAllByUser(foundUser.getId())).thenReturn(sellerPosts);
 
         // act
-        UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(1, "name_desc");
+        UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(foundUser.getId(), "name_desc");
 
         //assert
         assertionsFeature0003(sortedFollowers, obtainedUsers);
     }
 
     @Test
-    @DisplayName("US 0003 - NAME_ASC OK")
+    @DisplayName("T-0004: US-0003 el ordenamiento con name_asc está correcto")
     public void getAllFolowersAscTest() {
 
         // arrange
@@ -287,17 +291,17 @@ public class UserServiceTest {
 
         stablishMocks(foundUser, followers);
 
-        Mockito.when(postRepository.findAllByUser(1)).thenReturn(sellerPosts);
+        Mockito.when(postRepository.findAllByUser(foundUser.getId())).thenReturn(sellerPosts);
 
         // act
-        UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(1, "name_asc");
+        UserFollowersResponseDto obtainedUsers = userService.getAllFolowers(foundUser.getId(), "name_asc");
 
         //assert
         assertionsFeature0003(sortedFollowers, obtainedUsers);
     }
 
     @Test
-    @DisplayName("US 0004 - NAME_DESC OK")
+    @DisplayName("T-0004: US-0004 el ordenamiento con name_desc está correcto")
     public void getListOfFollowedSellersDescTest() {
 
         // arrange
@@ -309,14 +313,15 @@ public class UserServiceTest {
         stablishMocks(foundUser, followeds);
 
         // act
-        UserFollowedResponseDto obtainedUsers = userService.getListOfFollowedSellers(1, "name_desc");
+        UserFollowedResponseDto obtainedUsers = userService.getListOfFollowedSellers(foundUser.getId(),
+                                                                               "name_desc");
 
         //assert
         assertionsFeature0004(sortedFolloweds, obtainedUsers);
     }
 
     @Test
-    @DisplayName("US 0004 - NAME_ASC OK")
+    @DisplayName("T-0004: US-0004 el ordenamiento con name_asc está correcto")
     public void getListOfFollowedSellersAscTest() {
 
         // arrange
@@ -328,7 +333,8 @@ public class UserServiceTest {
         stablishMocks(foundUser, followeds);
 
         // act
-        UserFollowedResponseDto obtainedUsers = userService.getListOfFollowedSellers(1, "name_asc");
+        UserFollowedResponseDto obtainedUsers = userService.getListOfFollowedSellers(foundUser.getId(),
+                                                                               "name_asc");
 
         //assert
         assertionsFeature0004(sortedFolloweds, obtainedUsers);
