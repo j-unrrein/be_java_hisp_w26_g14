@@ -62,6 +62,10 @@ public class PostServiceTest {
 
         // assert
         Assertions.assertNotNull(result);
+        /*
+            Se agrega para validar las excepciones.
+            Assertions.assertDoesNotThrow(() -> service.getPostsFromFollowed(2, "test"));
+        */
     }
 
     @Test
